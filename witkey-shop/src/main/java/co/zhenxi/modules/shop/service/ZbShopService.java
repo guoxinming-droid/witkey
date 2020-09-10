@@ -6,7 +6,7 @@
 */
 package co.zhenxi.modules.shop.service;
 import co.zhenxi.common.service.BaseService;
-import co.zhenxi.modules.shop.domain.ZbShop;
+import co.zhenxi.modules.shop.domain.*;
 import co.zhenxi.modules.shop.service.dto.ZbShopDto;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
 import org.springframework.data.domain.Pageable;
@@ -71,5 +71,71 @@ public interface ZbShopService  extends BaseService<ZbShop>{
      */
     ZbShop getRecommendShopListById(Integer id);
 
+    /**
+     *  查询收藏店铺列表
+     * @param uid 用户id
+     * @return
+     */
+    List getCollectShop(Integer uid);
 
+    /**
+     * 获取作品和服务 套餐ID
+     * @param size
+     * @return
+     */
+    Map<String, Object> getShopByVip(Pageable size);
+
+    /**
+     * 获取推荐店铺  排序字段好评数
+     * @param size
+     * @return
+     */
+    Map<String, Object> getRecommendShop(Pageable size);
+
+    /**
+     * 店铺详情页
+     * @param shopId 店铺ID
+     * @return
+     */
+    ZbShop queryAllById(Integer shopId);
+
+    /**
+     * 获取服务商的作品
+     * @param shopId
+     * @return
+     */
+    Map getWorkById(String shopId,String type,String cateId,Pageable pageable);
+
+    /**
+     * 获取服务商成功案例
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    Map getSuccessCaseById(String shopId,String cateId ,Pageable pageable);
+
+    /**
+     * 计数
+     * @param shopId
+     * @param type
+     * @param pageable
+     * @return
+     */
+    List<Map<String ,Object>> getGoodsCount(String shopId, String type, Pageable pageable);
+
+    /**
+     * 成功案例计数
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    List<Map<String,Object>> getSuccessCaseCount(String shopId ,Pageable pageable);
+
+    /**
+     * 获取店铺评价
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable);
 }

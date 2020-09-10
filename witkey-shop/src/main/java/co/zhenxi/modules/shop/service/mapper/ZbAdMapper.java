@@ -8,7 +8,10 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbAd;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -19,4 +22,6 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface ZbAdMapper extends CoreMapper<ZbAd> {
 
+    @Select("select * from zb_ad where target_id = #{targetId}")
+    Page<ZbAd> queryAd(@Param("targetId") Integer targetId);
 }

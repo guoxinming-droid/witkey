@@ -8,6 +8,8 @@ package co.zhenxi.modules.shop.service.impl;
 
 import co.zhenxi.modules.shop.domain.ZbAd;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
 import com.github.pagehelper.PageInfo;
@@ -43,6 +45,8 @@ import java.util.LinkedHashMap;
 public class ZbAdServiceImpl extends BaseServiceImpl<ZbAdMapper, ZbAd> implements ZbAdService {
 
     private final IGenerator generator;
+
+    private final ZbAdMapper zbAdMapper;
 
     @Override
     //@Cacheable
@@ -85,5 +89,19 @@ public class ZbAdServiceImpl extends BaseServiceImpl<ZbAdMapper, ZbAd> implement
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    /**
+     * 查询指定广告位得广告
+     *
+     * @param targetId 广告位ID
+     * @param pageSize 广告个数
+     * @return List
+     */
+    @Override
+    public List queryAd(Integer targetId, Integer pageSize) {
+        PageHelper.startPage(0,pageSize);
+        Page<ZbAd> zbAds = zbAdMapper.queryAd(targetId);
+        return zbAds.getResult();
     }
 }

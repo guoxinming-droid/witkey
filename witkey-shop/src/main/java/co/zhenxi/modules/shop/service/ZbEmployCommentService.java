@@ -7,6 +7,7 @@
 package co.zhenxi.modules.shop.service;
 import co.zhenxi.common.service.BaseService;
 import co.zhenxi.modules.shop.domain.ZbEmployComment;
+import co.zhenxi.modules.shop.domain.ZbEmployCommentAdvice;
 import co.zhenxi.modules.shop.service.dto.ZbEmployCommentDto;
 import co.zhenxi.modules.shop.service.dto.ZbEmployCommentQueryCriteria;
 import org.springframework.data.domain.Pageable;
@@ -43,4 +44,12 @@ public interface ZbEmployCommentService  extends BaseService<ZbEmployComment>{
     * @throws IOException /
     */
     void download(List<ZbEmployCommentDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 获取评价
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable);
 }

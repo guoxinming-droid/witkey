@@ -8,7 +8,9 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbLink;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -19,4 +21,8 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface ZbLinkMapper extends CoreMapper<ZbLink> {
 
+    @Select(
+            "select * from zb_link where status =1 order by sort"
+    )
+    Page<ZbLink> getLink();
 }

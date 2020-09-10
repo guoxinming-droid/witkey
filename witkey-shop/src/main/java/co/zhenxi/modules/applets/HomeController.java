@@ -80,6 +80,7 @@ public class HomeController {
 
 
 
+
     @GetMapping(value = "/getRecommendShopListById")
     @Log("查询推荐商城首页推荐详情")
     @ApiOperation("查询推荐商城首页推荐详情")
@@ -105,7 +106,11 @@ public class HomeController {
     //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
     @AnonymousAccess
     public List<ZbSuccessCase> getSuccessCaseyUId(Integer uid){
-        return zbSuccessCaseMapper.getSuccessCaseyUId(uid);
+        String wheresql= "where 1 =1";
+        if(uid!=null && !"".equals(uid)){
+            wheresql+="and uid ="+uid;
+        }
+        return zbSuccessCaseMapper.getSuccessCaseyUId(wheresql);
     }
 
 

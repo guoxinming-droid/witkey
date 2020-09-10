@@ -47,9 +47,9 @@ public class ZbShop implements Serializable {
     @NotBlank
     private String shopName;
 
-    private String userName;
 
-    private String cityName;
+
+    private String uname;
 
     /** 店铺介绍 */
     @NotBlank
@@ -119,17 +119,12 @@ public class ZbShop implements Serializable {
     @NotBlank
     private String centralAd;
 
-    private List<ZbTagShop> tagShop;
 
-    private List<ZbGoods> goods;
 
     /** 底部广告 */
     @NotBlank
     private String footerAd;
-    /**
-     * 好评率
-     */
-    private Integer goodRate;
+
 
     /** 创建时间 */
     @NotNull
@@ -139,6 +134,22 @@ public class ZbShop implements Serializable {
     /** 修改时间 */
     @NotNull
     private Timestamp updatedAt;
+
+
+    /** 一级标签ID*/
+    private String catePid;
+
+    /** 二级标签ID*/
+    private String cateSid;
+
+
+    /** 二级标签名称*/
+    private String tagName;
+
+    /** 一级标签名称*/
+    private String tagPname;
+
+
 
 
     public void copy(ZbShop source){

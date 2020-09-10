@@ -17,6 +17,7 @@ import co.zhenxi.modules.shop.service.dto.ZbGoodsDto;
 import co.zhenxi.modules.shop.service.dto.ZbGoodsQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbGoodsMapper;
 import co.zhenxi.utils.FileUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -155,6 +156,7 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
         }
             whereSql+=" AND status = '1' ";
             whereSql+=" AND is_delete = '0' ";
+
         return zbGoodsMapper.selectGoodsByShopId(whereSql);
     }
 
@@ -170,9 +172,71 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
         return map;
     }
 
+    /**
+     * 获取作品和服务 排序字段 访问量
+     *
+     * @param size
+     * @return
+     */
+    @Override
+    public Map<String, Object> getGoods(Pageable size) {
 
+        getPage(size);
+        Page<ZbGoods> page = zbGoodsMapper.getGoods();
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(page.getResult(), ZbGoods.class));
+        map.put("totalElements", page.getTotal());
+        return map;
+    }
 
+    /**
+     * 作品及服务得数量
+     *
+     * @param shopId
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getGoodsCountByShopId(Integer shopId) {
+        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
+        for (int i = 1; i < 3 ; i++) {
+           mapList.add( zbGoodsMapper.selectGoodsCountByShopId(i,shopId));
+        }
 
+        return mapList;
+    }
+
+    /**
+     * 评分
+     *
+     * @param shopId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getGoodsScoreByShopId(Integer shopId) {
+        List<ZbGoodsComment> zbGoodsComments = zbGoodsMapper.selectGoodsCommentByShopId(shopId);
+        double speedScore = 0;
+        double qualityScore = 0;
+        double attitudeScore = 0;
+        if(zbGoodsComments!=null && zbGoodsComments.size()>0){
+            for (ZbGoodsComment zbGoodsComment : zbGoodsComments) {
+                //速度得分
+                speedScore+=zbGoodsComment.getSpeedScore();
+                //质量得分
+                qualityScore+=zbGoodsComment.getQualityScore();
+                //态度得分
+                attitudeScore+=zbGoodsComment.getAttitudeScore();
+            }
+            speedScore/=zbGoodsComments.size();
+            qualityScore/=zbGoodsComments.size();
+            attitudeScore/=zbGoodsComments.size();
+        }
+        LinkedHashMap<String , Object> linkedHashMap = new LinkedHashMap<>(2);
+        linkedHashMap.put("速度得分",speedScore);
+        linkedHashMap.put("质量得分",qualityScore);
+        linkedHashMap.put("态度得分",attitudeScore);
+
+        return linkedHashMap;
+    }
 
 
 }

@@ -61,4 +61,9 @@ public interface ZbArticleService  extends BaseService<ZbArticle>{
     * @throws IOException /
     */
     void download(List<ZbArticleDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 获取资讯文章
+     */
+    Map<String, Object> getArticle(Pageable size);
 }

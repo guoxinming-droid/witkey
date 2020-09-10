@@ -9,17 +9,19 @@ package co.zhenxi.modules.shop.service.impl;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
-import co.zhenxi.modules.shop.domain.ZbShop;
+import co.zhenxi.modules.shop.domain.*;
+import co.zhenxi.modules.shop.service.ZbEmployCommentService;
 import co.zhenxi.modules.shop.service.ZbGoodsService;
 import co.zhenxi.modules.shop.service.ZbShopService;
+import co.zhenxi.modules.shop.service.ZbSuccessCaseService;
 import co.zhenxi.modules.shop.service.dto.ZbShopDto;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
-import co.zhenxi.modules.shop.service.mapper.ZbGoodsMapper;
-import co.zhenxi.modules.shop.service.mapper.ZbShopMapper;
-import co.zhenxi.modules.shop.service.mapper.ZbTagShopMapper;
+import co.zhenxi.modules.shop.service.mapper.*;
 import co.zhenxi.utils.FileUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -52,6 +54,8 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
     private final ZbTagShopMapper zbTagShopMapper;
     private final ZbGoodsMapper zbGoodsMapper;
     private final ZbGoodsService zbGoodsService;
+    private final ZbSuccessCaseMapper zbSuccessCaseMapper;
+    private final ZbEmployCommentService zbEmployCommentService;
 
     @Override
     //@Cacheable
@@ -121,7 +125,7 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
 
     @Override
     public ZbShop getRecommendShopListById(Integer id) {
-        ZbShop shop = zbShopMapper.getShopByid(id);
+        ZbShopAdvice shop = zbShopMapper.getShopByid(id);
         if(shop != null && "".equals(shop)){
             shop.setTagShop(zbTagShopMapper.getTagShopByShopId(id));
             shop.setGoods(zbGoodsService.selectGoodsByShopId(id,1));
@@ -129,8 +133,166 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
         return generator.convert(shop, ZbShop.class);
     }
 
+    @Override
+    public List getCollectShop(Integer uid) {
+        if(uid<=0){
+            return new ArrayList<>();
+        }
+        List<ZbShopAdvice> collectShop = zbShopMapper.getCollectShop(uid);
+        for (ZbShopAdvice zbShopAdvice : collectShop) {
+            List<String> collectShop1 = zbShopMapper.getCollectShop1(uid, zbShopAdvice.getId());
+            zbShopAdvice.setList(collectShop1);
+        }
+        return collectShop;
+    }
+
+    /**
+     * 获取作品和服务 套餐ID
+     *
+     * @param size
+     * @return
+     */
+    @Override
+    public Map<String, Object> getShopByVip(Pageable size) {
+        getPage(size);
+        Page<Map<String , Object>> page = zbShopMapper.getShopByVip();
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", page.getResult());
+        map.put("totalElements", page.getTotal());
+        return map;
+    }
+
+    /**
+     * 获取推荐店铺  排序字段好评数
+     *
+     * @param size
+     * @return
+     */
+    @Override
+    public Map<String, Object> getRecommendShop(Pageable size) {
+        getPage(size);
+        Page<ZbShopAdvice> page = zbShopMapper.getRecommendShop();
+        List<ZbShopAdvice> result = page.getResult();
+        ZbShopAdvice zbShopAdvice = result.get(0);
+        System.out.println(zbShopAdvice.getPName()+": "+zbShopAdvice.getSName());
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(result,ZbShopAdvice.class));
+        map.put("totalElements", page.getTotal());
+        return map;
+    }
+
+    /**
+     * 店铺详情页
+     *
+     * @param shopId 店铺ID
+     * @return
+     */
+    @Override
+    public ZbShop queryAllById(Integer shopId) {
+        ZbShop zbShop = zbShopMapper.selectById(shopId);
+        return zbShop;
+    }
+
+    /**
+     * 获取服务商的作品和服务
+     *
+     * @param shopId
+     * @return
+     */
+    @Override
+    public Map getWorkById(String shopId,String type,String cateId,Pageable pageable) {
+        String whereSql = " WHERE 1 = 1 ";
+        if(shopId != null && !"".equals(shopId)){
+            whereSql+=" AND shop_id = "+shopId;
+        }
+        if(type != null && !"".equals(type)){
+            whereSql+=" AND type = "+type;
+        }
+        if(cateId != null && !"".equals(cateId)){
+            whereSql+=" AND cate_id = "+cateId;
+        }
+        whereSql+=" AND status = '1' ";
+        whereSql+=" AND is_delete = '0' ";
+        System.out.println(whereSql);
+        getPage(pageable);
+        Page<ZbGoods> zbGoods = zbGoodsMapper.selectGoodsByShopId(whereSql);
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(zbGoods.getResult(),ZbGoods.class));
+        map.put("totalElements", zbGoods.getTotal());
+        return map;
 
 
+    }
+
+    /**
+     * 获取服务商成功案例
+     *
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    @Override
+    public Map getSuccessCaseById(String shopId,String cateId, Pageable pageable) {
+        ZbShop zbShop = zbShopMapper.selectById(shopId);
+        if(null == zbShop){
+            return null;
+        }
+        String whereSql = " WHERE pub_uid =  "+zbShop.getId();
+
+        if(cateId != null && !"".equals(cateId)){
+            whereSql+=" AND cate_id = "+cateId;
+        }
+        System.out.println(whereSql);
+        getPage(pageable);
+        Page<ZbSuccessCase> successCaseyS = zbSuccessCaseMapper.getSuccessCaseyUId(whereSql);
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(successCaseyS.getResult(),ZbSuccessCase.class));
+        map.put("totalElements", successCaseyS.getTotal());
+        return map;
+    }
+
+    /**
+     * 计数
+     *
+     * @param shopId
+     * @param type
+     * @param pageable
+     * @return
+     */
+    @Override
+    public List<Map<String ,Object>> getGoodsCount(String shopId, String type, Pageable pageable) {
+
+        return zbGoodsMapper.getCateNameAndCount(shopId,type);
+    }
+
+    /**
+     * 成功案例计数
+     *
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getSuccessCaseCount(String shopId, Pageable pageable) {
+        ZbShop zbShop = zbShopMapper.selectById(shopId);
+        if(null == zbShop){
+            return null;
+        }
+        return  zbSuccessCaseMapper.getSuccessCaseCount(zbShop.getId());
+    }
+
+    /**
+     * 获取店铺评价
+     *
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    @Override
+    public ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable) {
+        zbEmployCommentService.getEvaluateByShopId(shopId,pageable);
+        return null;
+    }
 
 
 }

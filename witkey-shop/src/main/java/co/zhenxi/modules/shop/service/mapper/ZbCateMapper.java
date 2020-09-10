@@ -8,9 +8,9 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbCate;
+import co.zhenxi.modules.shop.domain.ZbCateAdvice;
 import co.zhenxi.modules.shop.service.dto.ZbCateQueryCriteria;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,4 +32,32 @@ public interface ZbCateMapper extends CoreMapper<ZbCate> {
 
     @Select("select * from zb_cate ${whereSql}")
     List<ZbCate> getZbCatesList(String whereSql);
+
+    @Select("select zb1.* ,zb2.name pname from zb_cate zb1, zb_cate zb2 where zb1.id = #{siD} and zb1.pid=zb2.id")
+    ZbCate getBySid(Integer siD);
+
+
+
+    @Select("select * from zb_cate where pid = 0 ORDER BY sort")
+    @Results(id = "ZbCateMap",value = {
+            @Result(id = true, column = "id",property = "id"),
+            @Result(column = "name",property = "name"),
+            @Result(column = "pid",property = "pid"),
+            @Result(column = "path",property = "path"),
+            @Result(column = "pic",property = "pic"),
+            @Result(column = "sort",property = "sort"),
+            @Result(column = "choose_num",property = "chooseNum"),
+            @Result(column = "created_at",property = "createdAt"),
+            @Result(column = "updated_at",property = "updatedAt"),
+            @Result(column = "id",property = "list",
+                    many =@Many(select = "co.zhenxi.modules.shop.service.mapper.ZbCateMapper.getAllById"),
+                    javaType = List.class
+            )
+
+    }
+    )
+    List<ZbCateAdvice> getAll();
+    @Select("select * from zb_cate where pid = #{id} ORDER BY sort")
+    List<ZbCateAdvice> getAllById(Integer id);
+
 }

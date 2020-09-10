@@ -94,4 +94,26 @@ public interface ZbGoodsService  extends BaseService<ZbGoods>{
      */
     Map<String, Object> getGoodsCommentByGoodId(Integer id,Integer type);
 
+
+    /**
+     * 获取作品和服务 排序字段 访问量
+     * @param size
+     * @return
+     */
+    Map<String, Object> getGoods(Pageable size);
+
+    /**
+     * 作品及服务得数量
+     * @param shopId
+     * @return
+     */
+    List<Map<String, Object>>  getGoodsCountByShopId(Integer shopId);
+
+
+    /**
+     * 评分
+     * @param shopId
+     * @return
+     */
+    Map<String, Object>  getGoodsScoreByShopId(Integer shopId);
 }

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -86,5 +87,12 @@ public class ZbTaskAttachmentServiceImpl extends BaseServiceImpl<ZbTaskAttachmen
     @Override
     public ZbTaskAttachment getByTaskId(long taskId) {
         return zbTaskAttachmentMapper.getByTaskId(taskId);
+    }
+
+    @Override
+    public void insert(ZbTaskAttachment zbTaskAttachment) {
+        zbTaskAttachment.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        zbTaskAttachment.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        zbTaskAttachmentMapper.insert(zbTaskAttachment);
     }
 }

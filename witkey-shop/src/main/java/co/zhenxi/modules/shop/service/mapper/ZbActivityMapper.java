@@ -8,7 +8,9 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbActivity;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -18,5 +20,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface ZbActivityMapper extends CoreMapper<ZbActivity> {
+
+    @Select("select * from zb_activity where status = 0 order by pub_at desc")
+    Page<ZbActivity> getActivity();
 
 }

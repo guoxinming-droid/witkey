@@ -16,6 +16,7 @@ import co.zhenxi.modules.shop.service.dto.ZbArticleDto;
 import co.zhenxi.modules.shop.service.dto.ZbArticleQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbArticleMapper;
 import co.zhenxi.utils.FileUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +48,7 @@ public class ZbArticleServiceImpl extends BaseServiceImpl<ZbArticleMapper, ZbArt
 
     private final IGenerator generator;
     private final ZbArticleCategoryService  zbArticleCategoryService;
+    private final ZbArticleMapper zbArticleMapper;
 
     @Override
     //@Cacheable
@@ -125,5 +127,20 @@ public class ZbArticleServiceImpl extends BaseServiceImpl<ZbArticleMapper, ZbArt
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    /**
+     * 获取资讯文章
+     *
+     * @param size
+     */
+    @Override
+    public Map<String, Object> getArticle(Pageable size) {
+        getPage(size);
+        Page<ZbArticle> page = zbArticleMapper.getArticle();
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(page.getResult(), ZbArticle.class));
+        map.put("totalElements", page.getTotal());
+        return map;
     }
 }

@@ -15,6 +15,7 @@ import co.zhenxi.modules.shop.service.dto.ZbSuccessCaseDto;
 import co.zhenxi.modules.shop.service.dto.ZbSuccessCaseQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbSuccessCaseMapper;
 import co.zhenxi.utils.FileUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -113,9 +114,31 @@ public class ZbSuccessCaseServiceImpl extends BaseServiceImpl<ZbSuccessCaseMappe
 
     @Override
     public List<ZbSuccessCase> getSuccessCaseyUId(Integer uid) {
-        return zbSuccessCaseMapper.getSuccessCaseyUId(uid);
+        String wheresql= "where 1 =1";
+        if(uid!=null && !"".equals(uid)){
+            wheresql+="and uid ="+uid;
+        }
+        Page<ZbSuccessCase> successCaseyUId = zbSuccessCaseMapper.getSuccessCaseyUId(wheresql);
+        return successCaseyUId.getResult();
+
     }
 
+    /**
+     * 获取推荐位的成功案例
+     *
+     * @param size
+     * @return
+     */
+    @Override
+    public Map<String, Object> getSuccessStories(Pageable size) {
+
+        getPage(size);
+        Page<ZbSuccessCase> page = zbSuccessCaseMapper.getSuccessStories();
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(page.getResult(), ZbSuccessCase.class));
+        map.put("totalElements", page.getTotal());
+        return map;
+    }
 
 
 }

@@ -8,7 +8,9 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbArticle;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -18,5 +20,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface ZbArticleMapper extends CoreMapper<ZbArticle> {
-
+    @Select("select *from zb_article where is_recommended = 1 order by description")
+    Page<ZbArticle> getArticle();
 }

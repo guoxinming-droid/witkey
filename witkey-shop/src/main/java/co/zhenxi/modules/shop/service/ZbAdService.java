@@ -43,4 +43,12 @@ public interface ZbAdService  extends BaseService<ZbAd>{
     * @throws IOException /
     */
     void download(List<ZbAdDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 查询指定广告位得广告
+     * @param targetId 广告位ID
+     * @param pageSize 广告个数
+     * @return List
+     */
+    List queryAd(Integer targetId, Integer pageSize);
 }

@@ -115,6 +115,13 @@ public class ZbShopController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
+    @GetMapping("/getCollectShop")
+    @Log("获取收藏店铺")
+    @ApiOperation("获取收藏店铺")
+    @AnonymousAccess
+    @ResponseBody
+    public List getCollectShop(@RequestParam Integer uid){
+        return zbShopService.getCollectShop(uid);
+    }
 
 }

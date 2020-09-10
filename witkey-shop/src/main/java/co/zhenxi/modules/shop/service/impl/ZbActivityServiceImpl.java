@@ -8,6 +8,7 @@ package co.zhenxi.modules.shop.service.impl;
 
 import co.zhenxi.modules.shop.domain.ZbActivity;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
+import com.github.pagehelper.Page;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
 import com.github.pagehelper.PageHelper;
@@ -26,14 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.cache.annotation.CacheConfig;
 //import org.springframework.cache.annotation.CacheEvict;
 //import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 /**
 * @author guoke
@@ -46,6 +44,8 @@ import java.util.LinkedHashMap;
 public class ZbActivityServiceImpl extends BaseServiceImpl<ZbActivityMapper, ZbActivity> implements ZbActivityService {
 
     private final IGenerator generator;
+
+    private final ZbActivityMapper zbActivityMapper;
 
     @Override
     //@Cacheable
@@ -83,5 +83,19 @@ public class ZbActivityServiceImpl extends BaseServiceImpl<ZbActivityMapper, ZbA
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    /**
+     * @param size 每页条数
+     * @return
+     */
+    @Override
+    public Map<String, Object> getActivity(Pageable size) {
+        getPage(size);
+        HashMap<String, Object> map = new HashMap<>();
+        Page<ZbActivity> page = zbActivityMapper.getActivity();
+        map.put("content", generator.convert(page.getResult(), ZbActivityDto.class));
+        map.put("totalElements", page.getTotal());
+        return map;
     }
 }

@@ -9,6 +9,7 @@ import co.zhenxi.common.service.BaseService;
 import co.zhenxi.modules.shop.domain.ZbSuccessCase;
 import co.zhenxi.modules.shop.service.dto.ZbSuccessCaseDto;
 import co.zhenxi.modules.shop.service.dto.ZbSuccessCaseQueryCriteria;
+import com.github.pagehelper.Page;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;
@@ -65,4 +66,11 @@ public interface ZbSuccessCaseService  extends BaseService<ZbSuccessCase>{
      * @return
      */
     List<ZbSuccessCase> getSuccessCaseyUId(Integer uid);
+
+    /**
+     * 获取推荐位的成功案例
+     * @param size
+     * @return
+     */
+    Map<String, Object> getSuccessStories(Pageable size);
 }

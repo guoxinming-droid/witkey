@@ -10,6 +10,8 @@ import co.zhenxi.modules.shop.domain.ZbUsers;
 import co.zhenxi.modules.shop.service.dto.ZbUsersDto;
 import co.zhenxi.modules.shop.service.dto.ZbUsersQueryCriteria;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
@@ -43,4 +45,41 @@ public interface ZbUsersService  extends BaseService<ZbUsers>{
     * @throws IOException /
     */
     void download(List<ZbUsersDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 邮箱注册
+     * @param zbUsers
+     */
+    ResponseEntity<Object> loginByEmail(ZbUsers zbUsers) throws Exception;
+
+    /**
+     * 手机注册
+     * @param zbUsers
+     */
+    ZbUsers loginByPhoneNum(ZbUsers zbUsers);
+
+
+    /**
+     * 查看是不是数据库得邮箱
+     * @param zbUsers
+     */
+    Map isEmail(ZbUsers zbUsers);
+
+
+    /**
+     * 看看用户是不是vip
+     * @param uid
+     * @return
+     */
+    ZbUsers isVIP(Integer uid);
+
+
+    ZbUsers selectByMobile(String Mobile);
+
+    /**
+     *
+     * @param id 用户id
+     * @param password 更改的密码
+     */
+    void updatePassword(Integer id, String password);
 }

@@ -9,12 +9,14 @@ package co.zhenxi.modules.shop.service.mapper;
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbCashout;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author guoke
@@ -64,4 +66,6 @@ public interface ZbCashoutMapper extends CoreMapper<ZbCashout> {
             "\tAND c.created_at <= #{endTime}")
     List<ZbCashout> cashoutList(String cashoutType, String userName, String startTime, String endTime);
 
+    @Select("select zbu.name name,zbc.cash cash,zbc.created_at time from zb_cashout zbc, zb_users zbu where zbc.uid = zbu.id  order by zbc.created_at desc")
+    Page<Map<String, Object>> getCashout();
 }

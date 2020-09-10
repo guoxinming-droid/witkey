@@ -8,6 +8,8 @@ package co.zhenxi.modules.shop.service.impl;
 
 import co.zhenxi.modules.shop.domain.ZbEmployComment;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
+import co.zhenxi.modules.shop.domain.ZbEmployCommentAdvice;
+import co.zhenxi.modules.shop.service.mapper.ZbEmployMapper;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
 import com.github.pagehelper.PageInfo;
@@ -43,6 +45,8 @@ import java.util.LinkedHashMap;
 public class ZbEmployCommentServiceImpl extends BaseServiceImpl<ZbEmployCommentMapper, ZbEmployComment> implements ZbEmployCommentService {
 
     private final IGenerator generator;
+
+    private final ZbEmployCommentMapper zbEmployCommentMapper;
 
 
     @Override
@@ -83,4 +87,19 @@ public class ZbEmployCommentServiceImpl extends BaseServiceImpl<ZbEmployCommentM
         }
         FileUtil.downloadExcel(list, response);
     }
+
+    /**
+     * 获取评价
+     *
+     * @param shopId
+     * @param pageable
+     * @return
+     */
+    @Override
+    public ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable) {
+
+        return zbEmployCommentMapper.getEvaluateByShopId(shopId);
+    }
+
+
 }

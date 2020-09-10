@@ -9,6 +9,7 @@ package co.zhenxi.modules.shop.service.impl;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.modules.shop.domain.ZbCate;
+import co.zhenxi.modules.shop.domain.ZbCateAdvice;
 import co.zhenxi.modules.shop.service.ZbCateService;
 import co.zhenxi.modules.shop.service.dto.ZbCateDto;
 import co.zhenxi.modules.shop.service.dto.ZbCateQueryCriteria;
@@ -101,5 +102,23 @@ public class ZbCateServiceImpl extends BaseServiceImpl<ZbCateMapper, ZbCate> imp
             whereSql += " AND pid = '0' ";
         }
         return zbCateMapper.getZbCatesList(whereSql);
+    }
+
+    @Override
+    public List getAll() {
+
+        return  zbCateMapper.getAll();
+    }
+
+    /**
+     * @param pid
+     * @return
+     */
+    @Override
+    public List<ZbCateAdvice> getCateType(Integer pid) {
+        if(pid>=0){
+            return  generator.convert(zbCateMapper.getAllById(pid), ZbCateAdvice.class);
+        }
+        return null;
     }
 }

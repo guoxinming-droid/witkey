@@ -9,11 +9,12 @@ package co.zhenxi.modules.shop.service.impl;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
-import co.zhenxi.modules.shop.domain.ZbTask;
-import co.zhenxi.modules.shop.domain.ZbTaskAttachment;
+import co.zhenxi.modules.shop.domain.*;
 import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbTaskDto;
 import co.zhenxi.modules.shop.service.dto.ZbTaskQueryCriteria;
+import co.zhenxi.modules.shop.service.mapper.ZbAdMapper;
+import co.zhenxi.modules.shop.service.mapper.ZbCateMapper;
 import co.zhenxi.modules.shop.service.mapper.ZbTaskMapper;
 import co.zhenxi.tools.service.LocalStorageService;
 import co.zhenxi.utils.DateUtils;
@@ -58,6 +59,8 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
     private final ZbTaskAttachmentService zbTaskAttachmentService;
     private final LocalStorageService localStorageService;
     private final ZbWorkService zbWorkService;
+    private final ZbCateMapper zbCateMapper;
+    private final ZbTaskServiceMapper zbTaskServiceMapper;
 
     @Override
     //@Cacheable
@@ -215,4 +218,125 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
         return zbTaskMapper.getTaskHallList(whereSql);
     }
 
+    @Override
+    public List<ZbTaskAdvice> getCollectTask(Integer uid) {
+        if(uid<=0){
+            return new ArrayList<>();
+        }
+        return zbTaskMapper.getCollectTask(uid);
+    }
+
+    /**
+     * 查询所有数据分页
+     *
+     * @param createTime ss
+     * @return List<ZbTaskDto>
+     */
+    @Override
+    public List<ZbTask> getByCreateTime(Timestamp createTime) {
+
+        return zbTaskMapper.getByCreateTime(createTime);
+    }
+
+    /**
+     * 一键新增任务
+     *
+     * @param zbTask
+     */
+    @Override
+    public void insert(ZbTask zbTask) {
+        //根据手机号看数据库又没
+        ZbUsers zbUsers1 = zbUserService.selectByMobile(zbTask.getPhone());
+        if(null==zbUsers1){
+            ZbUsers zbUsers = new ZbUsers();
+            zbUsers.setMobile(zbTask.getPhone());
+            zbUsers.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            Integer uId = zbUserService.loginByPhoneNum(zbUsers).getId();
+            zbTask.setUid(uId);
+        }else{
+            Integer uId = zbUsers1.getId();
+            zbTask.setUid(uId);
+            zbTask.setUsername(zbUsers1.getName());
+        }
+        zbTask.setStatus(1);
+        zbTask.setTypeId(0);
+        zbTask.setCateId(193);
+        zbTask.setUrl("");
+        zbTask.setSiteName("");
+        //前端需要增加一个标签 上线注释312 313
+        zbTask.setTagName("");
+        zbTask.setTagPname("");
+        zbTask.setType(0);
+        zbTask.setCheckedAt(new Timestamp(System.currentTimeMillis()));
+        zbTaskMapper.insert(zbTask);
+
+    }
+
+    /**
+     * 普通发布任务
+     *
+     * @param zbTask
+     * @param localStorages    附件件Id
+     */
+    @Override
+    public void releaseTask(ZbTaskAdvice zbTask, Integer[] localStorages) {
+        zbTask.setUrl("");
+        zbTask.setSiteName("");
+        //获取分级标签设置名称
+        ZbCate pZbCateBySid = getPZbCateBySid(zbTask.getCateId());
+        zbTask.setTagName(pZbCateBySid.getName());
+        zbTask.setTagPname(pZbCateBySid.getPname());
+        zbTask.setCheckedAt(new Timestamp(System.currentTimeMillis()));
+        zbTask.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        zbTask.setType(0);
+        //获取服务
+        String service1 = zbTask.getService();
+        String[] service = splitFileName(service1);
+        //插入表
+        zbTaskMapper.insert(zbTask);
+        Integer id = zbTask.getId();
+        //插入服务表
+        for (int i = 0; i < service.length; i++) {
+            ZbTaskServiceDomain zbTaskService = new ZbTaskServiceDomain();
+            zbTaskService.setTaskId(id);
+            zbTaskService.setServiceId(Integer.parseInt(service[i]));
+            zbTaskService.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            zbTaskService.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            zbTaskServiceMapper.insert(zbTaskService);
+        }
+        //插入附件地址
+        for (int i = 0; i < localStorages.length; i++) {
+            ZbTaskAttachment zbTaskAttachment = new ZbTaskAttachment();
+            zbTaskAttachment.setTaskId(id);
+            zbTaskAttachment.setAttachmentId(localStorages[i]);
+            zbTaskAttachmentService.insert(zbTaskAttachment);
+        }
+
+
+    }
+
+    private String[] splitFileName(String fileName){
+        return fileName.split(",",5);
+    }
+
+    /**根据子ID获取父对象及其本身
+     *
+     */
+    private ZbCate getPZbCateBySid(Integer SiD){
+        ZbCate bySid = zbCateMapper.getBySid(SiD);
+        System.out.println(bySid.getName()+":   "+bySid.getPname());
+        return bySid;
+    }
+
+    /**
+     * 收藏任务
+     *
+     * @param taskId 任务id
+     * @param uId    用户id
+     */
+    @Override
+    public void collectionTask(Integer taskId, Integer uId) {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        zbTaskMapper.insertCollectionTask(taskId,uId,timestamp,timestamp);
+    }
 }

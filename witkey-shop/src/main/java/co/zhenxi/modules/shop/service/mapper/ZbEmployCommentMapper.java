@@ -8,7 +8,9 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbEmployComment;
+import co.zhenxi.modules.shop.domain.ZbEmployCommentAdvice;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -19,4 +21,6 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface ZbEmployCommentMapper extends CoreMapper<ZbEmployComment> {
 
+    @Select("select * from ")
+    ZbEmployCommentAdvice getEvaluateByShopId(String shopId);
 }

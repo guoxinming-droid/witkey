@@ -7,12 +7,14 @@
 package co.zhenxi.modules.shop.service;
 import co.zhenxi.common.service.BaseService;
 import co.zhenxi.modules.shop.domain.ZbTask;
+import co.zhenxi.modules.shop.domain.ZbTaskAdvice;
 import co.zhenxi.modules.shop.service.dto.ZbTaskDto;
 import co.zhenxi.modules.shop.service.dto.ZbTaskQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -102,5 +104,35 @@ public interface ZbTaskService  extends BaseService<ZbTask>{
      */
     List<ZbTask> getTaskHallList(Integer typeId,Integer cateId);
 
+    /**
+     * 查询收藏任务列表
+     * @param uid 用户id
+     * @return
+     */
+    List<ZbTaskAdvice> getCollectTask(Integer uid);
 
+    /**
+     * 查询所有数据分页
+     * @param createTime ss
+     * @return List<ZbTaskDto>
+     */
+    List<ZbTask> getByCreateTime(Timestamp createTime);
+
+    /**
+     * 一键新增任务
+     */
+    void insert(ZbTask zbTask);
+
+    /**
+     * 普通发布任务
+     * @param ids 附件件Id
+     */
+    void releaseTask(ZbTaskAdvice zbTask,Integer[] ids);
+
+    /**
+     * 收藏任务
+     * @param taskId 任务id
+     * @param uId 用户id
+     */
+    void collectionTask(Integer taskId, Integer uId);
 }

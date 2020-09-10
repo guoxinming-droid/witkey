@@ -51,4 +51,6 @@ public interface ZbTaskAttachmentService  extends BaseService<ZbTaskAttachment>{
      * @return
      */
     ZbTaskAttachment getByTaskId(long taskId);
+
+    void insert(ZbTaskAttachment zbTaskAttachment);
 }

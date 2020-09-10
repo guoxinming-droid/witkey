@@ -15,6 +15,7 @@ import co.zhenxi.modules.shop.service.dto.ZbCashoutDto;
 import co.zhenxi.modules.shop.service.dto.ZbCashoutQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbCashoutMapper;
 import co.zhenxi.utils.FileUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // 默认不使用缓存
 //import org.springframework.cache.annotation.CacheConfig;
@@ -123,6 +121,23 @@ public class ZbCashoutServiceImpl extends BaseServiceImpl<ZbCashoutMapper, ZbCas
     @Override
     public List<ZbCashout> cashoutList(String cashoutType, String userName, String startTime, String endTime) {
         return zbCashoutMapper.cashoutList(cashoutType,userName,startTime,endTime);
+    }
+
+    /**
+     * 获取提现记录
+     *
+     * @param size
+     * @return
+     */
+    @Override
+    public Map<String, Object> getCashout(Pageable size) {
+        getPage(size);
+        HashMap<String, Object> map = new HashMap<>(2);
+        Page<Map<String,Object>> page = zbCashoutMapper.getCashout();
+        //System.out.println(page.getList());
+        map.put("content", page.getResult());
+        map.put("totalElements", page.getTotal());
+        return map;
     }
 
 }

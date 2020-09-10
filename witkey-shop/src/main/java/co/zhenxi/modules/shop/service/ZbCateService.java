@@ -7,6 +7,7 @@
 package co.zhenxi.modules.shop.service;
 import co.zhenxi.common.service.BaseService;
 import co.zhenxi.modules.shop.domain.ZbCate;
+import co.zhenxi.modules.shop.domain.ZbCateAdvice;
 import co.zhenxi.modules.shop.service.dto.ZbCateDto;
 import co.zhenxi.modules.shop.service.dto.ZbCateQueryCriteria;
 import org.springframework.data.domain.Pageable;
@@ -49,4 +50,13 @@ public interface ZbCateService  extends BaseService<ZbCate>{
 
 
     List<ZbCate> getZbCatesList(Integer fid);
+
+    List getAll();
+
+    /**
+     *
+     * @param pid
+     * @return
+     */
+    List<ZbCateAdvice> getCateType(Integer pid);
 }

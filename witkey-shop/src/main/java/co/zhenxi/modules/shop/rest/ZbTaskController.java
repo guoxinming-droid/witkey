@@ -10,6 +10,7 @@ import co.zhenxi.annotation.AnonymousAccess;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.logging.aop.log.Log;
 import co.zhenxi.modules.shop.domain.ZbTask;
+import co.zhenxi.modules.shop.domain.ZbTaskAdvice;
 import co.zhenxi.modules.shop.domain.ZbWorkComments;
 import co.zhenxi.modules.shop.service.ZbTaskService;
 import co.zhenxi.modules.shop.service.ZbWorkCommentsService;
@@ -132,7 +133,14 @@ public class ZbTaskController {
         return zbWorkCommentsService.getWorkCommentsById(id);
     }
 
-
+    @GetMapping("/getCollectTask")
+    @Log("获取收藏任务")
+    @ApiOperation("获取收藏任务")
+    @AnonymousAccess
+    @ResponseBody
+    public List<ZbTaskAdvice> getCollectShop(@RequestParam Integer uid){
+        return zbTaskService.getCollectTask(uid);
+    }
 
 
 

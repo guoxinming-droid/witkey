@@ -89,4 +89,12 @@ public interface ZbCashoutService  extends BaseService<ZbCashout>{
      * @return
      */
     List<ZbCashout>  cashoutList(String cashoutType ,String userName,String startTime,String endTime);
+
+
+    /**
+     * 获取提现记录
+     * @param size
+     * @return
+     */
+    Map<String, Object> getCashout(Pageable size);
 }

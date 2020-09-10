@@ -9,12 +9,14 @@ package co.zhenxi.modules.shop.service.mapper;
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbSuccessCase;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author guoke
@@ -42,7 +44,44 @@ public interface ZbSuccessCaseMapper extends CoreMapper<ZbSuccessCase> {
             "\tzb_success_case"})
     List<ZbSuccessCase> successCaseList(@Param("ew") Wrapper<ZbSuccessCase> queryWrapper);
 
-    @Select(" SELECT  id,uid,username,title,des,url,pic,cate_id,type,pub_uid,view_count,created_at,cash FROM zb_success_case   WHERE pub_uid = ${uid} ")
-    List<ZbSuccessCase> getSuccessCaseyUId(Integer uid);
+    @Select(" SELECT  id,uid,username,title,des,url,pic,cate_id,type,pub_uid,view_count,created_at,cash FROM zb_success_case  ${where} ")
+    Page<ZbSuccessCase> getSuccessCaseyUId(String  where);
 
+
+    @Select("SELECT\n" +
+            "\t* \n" +
+            "FROM\n" +
+            "\tzb_success_case \n" +
+            "WHERE\n" +
+            "\ttitle IN ( SELECT recommend_name FROM zb_recommend WHERE type = 'successcase' ) \n" +
+            "ORDER BY\n" +
+            "\tview_count DESC")
+    Page<ZbSuccessCase> getSuccessStories();
+
+    @Select("select \n" +
+            "ssm.cate_id,\n" +
+            "(select name from zb_cate where id = ssm.cate_id) cateName,\n" +
+            "(count(1)) count\n" +
+            "from\n" +
+            "(SELECT\n" +
+            "\tid,\n" +
+            "\tuid,\n" +
+            "\tusername,\n" +
+            "\ttitle,\n" +
+            "\tdes,\n" +
+            "\turl,\n" +
+            "\tpic,\n" +
+            "\tcate_id,\n" +
+            "\ttype,\n" +
+            "\tpub_uid,\n" +
+            "\tview_count,\n" +
+            "\tcreated_at,\n" +
+            "\tcash \n" +
+            "FROM\n" +
+            "\tzb_success_case \n" +
+            "WHERE\n" +
+            "\tpub_uid = #{id}\n" +
+            "\t) ssm\n" +
+            "\tgroup by ssm.cate_id")
+    List<Map<String ,Object>> getSuccessCaseCount(Integer id);
 }

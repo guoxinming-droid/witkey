@@ -43,4 +43,11 @@ public interface ZbLinkService  extends BaseService<ZbLink>{
     * @throws IOException /
     */
     void download(List<ZbLinkDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 获取友情链接
+     * @param size
+     * @return
+     */
+    Map<String, Object> getLink(Pageable size);
 }

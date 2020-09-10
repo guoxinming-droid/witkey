@@ -8,6 +8,7 @@ package co.zhenxi.modules.shop.service.impl;
 
 import co.zhenxi.modules.shop.domain.ZbLink;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
+import com.github.pagehelper.Page;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
 import com.github.pagehelper.PageInfo;
@@ -44,6 +45,8 @@ public class ZbLinkServiceImpl extends BaseServiceImpl<ZbLinkMapper, ZbLink> imp
 
     private final IGenerator generator;
 
+    private final ZbLinkMapper zbLinkMapper;
+
 
     @Override
     //@Cacheable
@@ -78,5 +81,21 @@ public class ZbLinkServiceImpl extends BaseServiceImpl<ZbLinkMapper, ZbLink> imp
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    /**
+     * 获取友情链接
+     *
+     * @param size
+     * @return
+     */
+    @Override
+    public Map<String, Object> getLink(Pageable size) {
+        getPage(size);
+        Page<ZbLink> page = zbLinkMapper.getLink();
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(page.getResult(), ZbLink.class));
+        map.put("totalElements", page.getTotal());
+        return map;
     }
 }

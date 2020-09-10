@@ -8,13 +8,17 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbGoods;
+import co.zhenxi.modules.shop.domain.ZbGoodsComment;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.github.pagehelper.Page;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author guoke
@@ -86,7 +90,21 @@ public interface ZbGoodsMapper extends CoreMapper<ZbGoods> {
             "\tgood_comment \n" +
             "FROM\n" +
             "\tzb_goods ${whereSql} ")
-    List<ZbGoods> selectGoodsByShopId(String whereSql);
+    Page<ZbGoods> selectGoodsByShopId(String whereSql);
+
+    @Select("SELECT\n" +
+            "CASE\n" +
+            "\ttype \n" +
+            "\tWHEN 1 THEN\n" +
+            "\t'作品' ELSE '服务' \n" +
+            "\tEND AS '类型',\n" +
+            "\t( count( 1 ) ) AS count \n" +
+            "FROM\n" +
+            "\tzb_goods zg \n" +
+            "WHERE\n" +
+            "\tzg.type = #{type} \n" +
+            "\tAND zg.shop_id = #{shopId}")
+    Map<String ,Object> selectGoodsCountByShopId(Integer type,Integer shopId);
 
     @Select(" SELECT\n" +
             "\tid,\n" +
@@ -115,5 +133,45 @@ public interface ZbGoodsMapper extends CoreMapper<ZbGoods> {
             "FROM\n" +
             "\tzb_goods where status = '1'  AND is_delete = '0' AND id = ${id} ")
     List<ZbGoods> selectById(Integer id);
+
+
+    @Select("SELECT\n" +
+            "\tzbg.*,\n" +
+            "\tzbu.NAME uName \n" +
+            "FROM\n" +
+            "\tzb_goods zbg,\n" +
+            "\tzb_users zbu \n" +
+            "WHERE\n" +
+            "\tzbg.uid = zbu.id \n" +
+            "\tAND zbg.STATUS = 1 \n" +
+            "\tAND zbg.is_recommend = 1 \n" +
+            "\tAND recommend_end > NOW( )")
+    Page<ZbGoods> getGoods();
+
+    @Select("select \n" +
+            "( SELECT NAME FROM zb_cate WHERE id = cate_id ) catename,\n" +
+            "\t( count( 1 ) ) count,\n" +
+            "\tssm.cate_id\n" +
+            "\tfrom\n" +
+            "(SELECT\n" +
+            "\t *\n" +
+            "FROM\n" +
+            "\tzb_goods \n" +
+            "WHERE\n" +
+            "\t1 = 1 \n" +
+            "\tAND shop_id = #{shopId} \n" +
+            "\tAND type = #{type} \n" +
+            "\tAND STATUS = 1 \n" +
+            "\tAND is_delete = 0 ) ssm\n" +
+            "GROUP BY\n" +
+            "\tssm.cate_id  ")
+    List<Map<String ,Object>> getCateNameAndCount(String shopId, String type);
+
+
+
+    @Select("select * from zb_goods zg , zb_goods_comment zgc where zg.id = zgc.goods_id and zg.shop_id = #{shopId}")
+    List<ZbGoodsComment> selectGoodsCommentByShopId(Integer shopId);
+
+
 
 }

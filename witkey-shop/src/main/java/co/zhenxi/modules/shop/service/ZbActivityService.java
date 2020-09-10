@@ -43,4 +43,12 @@ public interface ZbActivityService  extends BaseService<ZbActivity>{
     * @throws IOException /
     */
     void download(List<ZbActivityDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     *
+     * @param size 每页条数
+     * @return
+     */
+    Map<String, Object> getActivity(Pageable size);
+
 }

@@ -47,4 +47,15 @@ public interface ZbWorkService  extends BaseService<ZbWork>{
 
     List<ZbWork> getWorkByTaskId(long taskId);
 
+    /**
+     * 获取中标信息表
+     * @return
+     */
+    Map<String, Object> getWorkAll(Pageable size);
+
+    /**
+     * cha ru shu jv
+     * @param zbWork
+     */
+    Map insert(ZbWork zbWork);
 }
