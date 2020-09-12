@@ -117,4 +117,19 @@ public interface ZbShopMapper extends CoreMapper<ZbShop> {
     Page<ZbShopAdvice> getRecommendShop();
 
 
+    @Select("select *,(select count(1) from zb_employ,zb_shop where zb_employ.employee_uid = zb_shop.uid) as serviceCount from zb_shop where id =#{id}")
+    ZbShop getShopByid1(Integer shopId);
+
+    @Select("SELECT\n" +
+            "\tzb_district.NAME AS cityNmae \n" +
+            "FROM\n" +
+            "\tzb_shop,\n" +
+            "\tzb_goods,\n" +
+            "\tzb_district \n" +
+            "WHERE\n" +
+            "\tzb_goods.shop_id = zb_shop.id \n" +
+            "\tAND zb_district.id = zb_shop.city \n" +
+            "\tAND zb_goods.id = #{id}")
+    Map<String,Object> selectByGoodsId(Integer id);
+
 }

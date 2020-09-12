@@ -28,6 +28,12 @@ public class ZbGoodsQueryCriteria{
     @Query
     private Integer type;
 
+    @Query
+    private Integer cateId;
+
+    @Query
+    private Integer catePid;
+
     /** 精确 */
     @Query
     private Integer is_delete;

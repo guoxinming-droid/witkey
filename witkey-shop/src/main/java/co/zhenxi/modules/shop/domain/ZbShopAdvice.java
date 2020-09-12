@@ -3,6 +3,7 @@ package co.zhenxi.modules.shop.domain;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Jia Hao Hao
@@ -29,6 +30,7 @@ public class ZbShopAdvice extends ZbShop {
     private List<ZbGoods> goods;
 
     private String userName;
+
 
     /**
      * 好评率

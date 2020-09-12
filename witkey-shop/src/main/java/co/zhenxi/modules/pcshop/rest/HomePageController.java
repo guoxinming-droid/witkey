@@ -193,11 +193,11 @@ public class HomePageController {
     //@PreAuthorize("@el.check('admin','zbActivity:del')")
     @AnonymousAccess
     @GetMapping("/getGoods")
-    public Map<String,Object> getGoods( @PageableDefault(sort = "zbg.view_num") Pageable size){
+    public Map<String,Object> getGoods( @PageableDefault(sort = "zbg.view_num") Pageable size, Integer type){
         /**
          * 服务和作品
          */
-        return zbGoodsService.getGoods(size);
+        return zbGoodsService.getGoods(size,type);
     }
 
     @Log("获取VIP店铺")

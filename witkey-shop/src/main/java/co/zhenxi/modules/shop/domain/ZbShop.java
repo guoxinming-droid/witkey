@@ -14,6 +14,7 @@ import javax.validation.constraints.*;
 import java.sql.Timestamp;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author Guoxm
@@ -150,6 +151,9 @@ public class ZbShop implements Serializable {
     private String tagPname;
 
 
+    private Map<String ,Object> authenticationMap;
+
+    private Integer serviceCount;
 
 
     public void copy(ZbShop source){

@@ -59,4 +59,6 @@ public interface ZbShopOrderService  extends BaseService<ZbShopOrder>{
      * @return
      */
     ZbShopOrder findById(long id);
+
+    void GoodsPutOrder(Integer[] goodsId, Pageable pageable);
 }

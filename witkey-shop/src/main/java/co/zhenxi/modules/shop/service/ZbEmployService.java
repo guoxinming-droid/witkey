@@ -61,4 +61,6 @@ public interface ZbEmployService  extends BaseService<ZbEmploy>{
     * @throws IOException /
     */
     void download(List<ZbEmployDto> all, HttpServletResponse response) throws IOException;
+
+    void InsertEmploy( ZbEmploy zbEmploy, Integer[] ids);
 }

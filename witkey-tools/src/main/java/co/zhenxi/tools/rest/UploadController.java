@@ -52,6 +52,7 @@ public class UploadController {
     @AnonymousAccess
     public ResponseEntity<Object> create(@RequestParam(defaultValue = "name") String name, @RequestParam("files") MultipartFile[] files) {
         StringBuilder url = new StringBuilder();
+        Map<String, Object> map = new HashMap<>(2);
         if (StrUtil.isNotEmpty(localUrl)) { //存在走本地
             for (MultipartFile file : files) {
                 LocalStorageDto localStorageDTO = localStorageService.create(name, file);
@@ -60,6 +61,7 @@ public class UploadController {
                 } else {
                     url = url.append(","+localUrl + "/file/" + localStorageDTO.getType() + "/" + localStorageDTO.getRealName());
                 }
+                map.put("localStorageDTO",localStorageDTO);
             }
         } else {//走七牛云
             for (MultipartFile file : files) {
@@ -69,10 +71,10 @@ public class UploadController {
                 }else{
                     url = url.append(","+qiniuContent.getUrl());
                 }
+                map.put("qiniuContent",qiniuContent);
             }
         }
 
-        Map<String, Object> map = new HashMap<>(2);
         map.put("errno", 0);
         map.put("link", url);
         return new ResponseEntity(map, HttpStatus.CREATED);

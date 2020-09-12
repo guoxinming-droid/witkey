@@ -24,10 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // 默认不使用缓存
 //import org.springframework.cache.annotation.CacheConfig;
@@ -95,5 +92,34 @@ public class ZbGoodsCommentServiceImpl extends BaseServiceImpl<ZbGoodsCommentMap
             whereSql +=" AND gc.type = "+type;
         }
         return zbGoodsCommentMapper.getGoodsCommentByGoodId(whereSql);
+    }
+
+    /**
+     * 查询数据分页
+     *
+     * @param criteria 条件
+     * @param pageable 分页参数
+     * @return Map<String, Object>
+     */
+    @Override
+    public Map<String, Object> queryAllAndComment(ZbGoodsCommentQueryCriteria criteria, Pageable pageable) {
+        getPage(pageable);
+        PageInfo<ZbGoodsComment> page = new PageInfo<>(queryAll(criteria));
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(page.getList(), ZbGoodsCommentDto.class));
+        map.put("totalElements", page.getTotal());
+        Map<String, Object> map1 = zbGoodsCommentMapper.getAnyCommentByGoodsId(criteria.getGoodsId());
+        if(map1==null){
+            map.put("好评率","100%");
+            map.put("速度得分",0);
+            map.put("态度得分",0);
+            map.put("质量得分",0);
+        }else {
+            Set<String> keys = map1.keySet();
+            for (String key : keys) {
+                map.put(key, map1.get(key));
+            }
+        }
+        return map;
     }
 }

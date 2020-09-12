@@ -115,5 +115,18 @@ public class ZbRealnameAuthServiceImpl extends BaseServiceImpl<ZbRealnameAuthMap
         zbRealnameAuthMapper.updateOnstatus(status,id);
     }
 
+    /**
+     * 根据用户Id
+     *
+     * @param uid
+     * @param i
+     * @return
+     */
+    @Override
+    public ZbRealnameAuth getByUid(Integer uid, int i) {
+
+        return zbRealnameAuthMapper.getByUid(uid,i);
+    }
+
 
 }

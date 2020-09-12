@@ -96,7 +96,7 @@ public class ZbEmployCommentServiceImpl extends BaseServiceImpl<ZbEmployCommentM
      * @return
      */
     @Override
-    public ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable) {
+    public List<ZbEmployCommentAdvice> getEvaluateByShopId(String shopId, Pageable pageable) {
 
         return zbEmployCommentMapper.getEvaluateByShopId(shopId);
     }

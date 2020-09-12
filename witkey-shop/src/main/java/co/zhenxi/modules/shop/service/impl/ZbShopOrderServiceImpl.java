@@ -109,4 +109,9 @@ public class ZbShopOrderServiceImpl extends BaseServiceImpl<ZbShopOrderMapper, Z
         }
         return zbShopOrder;
     }
+
+    @Override
+    public void GoodsPutOrder(Integer[] goodsId, Pageable pageable) {
+
+    }
 }

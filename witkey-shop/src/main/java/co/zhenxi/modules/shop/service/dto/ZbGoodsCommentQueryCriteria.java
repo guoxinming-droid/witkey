@@ -24,6 +24,10 @@ public class ZbGoodsCommentQueryCriteria{
 
     /** 精确 */
     @Query
+    private Integer goodsId;
+
+    /** 精确 */
+    @Query
     private Integer type;
     /** BETWEEN */
     @Query(type = Query.Type.BETWEEN)

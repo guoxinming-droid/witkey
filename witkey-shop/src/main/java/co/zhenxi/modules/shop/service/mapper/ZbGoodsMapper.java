@@ -8,6 +8,7 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbGoods;
+import co.zhenxi.modules.shop.domain.ZbGoodsAdvice;
 import co.zhenxi.modules.shop.domain.ZbGoodsComment;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.github.pagehelper.Page;
@@ -145,8 +146,9 @@ public interface ZbGoodsMapper extends CoreMapper<ZbGoods> {
             "\tzbg.uid = zbu.id \n" +
             "\tAND zbg.STATUS = 1 \n" +
             "\tAND zbg.is_recommend = 1 \n" +
-            "\tAND recommend_end > NOW( )")
-    Page<ZbGoods> getGoods();
+            "\tAND recommend_end > NOW( )\n" +
+            "\t ${sql}")
+    Page<ZbGoods> getGoods(String sql);
 
     @Select("select \n" +
             "( SELECT NAME FROM zb_cate WHERE id = cate_id ) catename,\n" +
@@ -173,5 +175,56 @@ public interface ZbGoodsMapper extends CoreMapper<ZbGoods> {
     List<ZbGoodsComment> selectGoodsCommentByShopId(Integer shopId);
 
 
+    @Select("SELECT\n" +
+            "\ttype,\n" +
+            "CASE\n" +
+            "\ttype \n" +
+            "\tWHEN 1 THEN\n" +
+            "\t\"作品\" \n" +
+            "\tWHEN 2 THEN\n" +
+            "\t\"服务\" ELSE \"其他\" end as 类型\n" +
+            "FROM\n" +
+            "\tzb_goods \n" +
+            "GROUP BY\n" +
+            "\ttype ")
+    List<Map<String, Object>> getGoodsType();
 
+    @Select("SELECT\n" +
+            "\t( SELECT NAME FROM zb_cate, zb_goods WHERE zb_cate.id = zb_goods.cate_pid and zb_goods.id=#{goodsId} ) AS tagPame,\n" +
+            "\t( SELECT NAME FROM zb_cate, zb_goods WHERE zb_cate.id = zb_goods.cate_id and zb_goods.id=#{goodsId}) AS tagName,\n" +
+            "\tzb_goods.* \n" +
+            "FROM\n" +
+            "\tzb_goods \n" +
+            "WHERE\n" +
+            "\tid = #{goodsId}")
+    ZbGoodsAdvice getGoodsByType(Integer goodsId);
+
+    @Select("SELECT\n" +
+            "\t* \n" +
+            "FROM\n" +
+            "\tzb_goods \n" +
+            "WHERE\n" +
+            "\tzb_goods.shop_id = ( SELECT zb_goods.shop_id FROM zb_goods, zb_shop WHERE zb_goods.id =#{goodsId} AND zb_shop.id = zb_goods.shop_id ) \n" +
+            "AND zb_goods.id != #{goodsId}\n" +
+            "\tand status = 1\n" +
+            "\tand is_recommend = 0\n" +
+            "\tand type = 1\n" +
+            "\torder by view_num desc")
+    Page<ZbGoods> getGoodsByOther(Integer goodsId);
+
+    @Select("" +
+            "select \n" +
+            "id ," +
+            "title ," +
+            "( SELECT NAME FROM zb_cate, zb_goods WHERE zb_cate.id = zb_goods.cate_pid and zb_goods.id=#{goodsId} ) AS tagPame," +
+            "( SELECT NAME FROM zb_cate, zb_goods WHERE zb_cate.id = zb_goods.cate_id and zb_goods.id=#{goodsId}) AS tagName," +
+            "cash\n" +
+            "from\n" +
+            "zb_goods \n" +
+            "where \n" +
+            "status = 1 \n" +
+            "AND \n" +
+            "is_delete = 0 \n" +
+            "AND id = #{goodsId}")
+    Map<String ,Object> selectGoodsById(Integer goodsId);
 }

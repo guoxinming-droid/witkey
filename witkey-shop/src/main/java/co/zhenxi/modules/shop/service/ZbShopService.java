@@ -137,5 +137,12 @@ public interface ZbShopService  extends BaseService<ZbShop>{
      * @param pageable
      * @return
      */
-    ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable);
+    Map<String,Object> getEvaluateByShopId(String shopId, Pageable pageable);
+
+//    /**
+//     *
+//     * @param shopId
+//     * @return
+//     */
+//    ZbShop getShopById(Integer shopId);
 }

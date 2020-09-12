@@ -35,7 +35,7 @@ public class ZbEmploy implements Serializable {
 
     /** 雇佣描述 */
     @NotBlank
-    private String desc;
+    private String descs;
 
 
     /** 联系电话 */

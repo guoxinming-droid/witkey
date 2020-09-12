@@ -68,4 +68,11 @@ public interface ZbAlipayAuthService  extends BaseService<ZbAlipayAuth>{
      * @param status
      */
     void onStatus(Integer id, int status);
+
+    /**
+     * 根据用户名获取
+     * @param uid
+     * @return
+     */
+    ZbAlipayAuth getByUid(Integer uid);
 }

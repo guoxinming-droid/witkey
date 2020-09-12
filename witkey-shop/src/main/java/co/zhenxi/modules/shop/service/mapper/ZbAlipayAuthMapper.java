@@ -10,6 +10,7 @@ import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbAlipayAuth;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,7 @@ public interface ZbAlipayAuthMapper extends CoreMapper<ZbAlipayAuth> {
 
     @Update( "update zb_alipay_auth set status = #{status},auth_time = now() where id = #{id} ")
     void updateOnstatus(@Param("status") int status, @Param("id") int id);
+
+    @Select("select * from zb_alipay_auth where uid = #{uid}")
+    ZbAlipayAuth getByUid(Integer uid);
 }

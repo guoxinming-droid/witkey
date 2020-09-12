@@ -51,5 +51,5 @@ public interface ZbEmployCommentService  extends BaseService<ZbEmployComment>{
      * @param pageable
      * @return
      */
-    ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable);
+    List<ZbEmployCommentAdvice> getEvaluateByShopId(String shopId, Pageable pageable);
 }

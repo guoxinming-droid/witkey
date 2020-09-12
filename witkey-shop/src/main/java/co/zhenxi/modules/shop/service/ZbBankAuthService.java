@@ -70,4 +70,12 @@ public interface ZbBankAuthService  extends BaseService<ZbBankAuth>{
      * @param status
      */
     void onStatus(Integer id, int status);
+
+    /**
+     * 根据用户ID
+     * @param uid
+     * @return
+     */
+    ZbBankAuth getByUid(Integer uid);
+
 }

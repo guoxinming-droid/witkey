@@ -10,10 +10,7 @@ import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.modules.shop.domain.*;
-import co.zhenxi.modules.shop.service.ZbEmployCommentService;
-import co.zhenxi.modules.shop.service.ZbGoodsService;
-import co.zhenxi.modules.shop.service.ZbShopService;
-import co.zhenxi.modules.shop.service.ZbSuccessCaseService;
+import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbShopDto;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.*;
@@ -28,11 +25,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // 默认不使用缓存
 //import org.springframework.cache.annotation.CacheConfig;
@@ -56,6 +51,10 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
     private final ZbGoodsService zbGoodsService;
     private final ZbSuccessCaseMapper zbSuccessCaseMapper;
     private final ZbEmployCommentService zbEmployCommentService;
+    private final ZbUsersService zbUsersService;
+    private final ZbAlipayAuthService zbAlipayAuthService;
+    private final ZbBankAuthService zbBankAuthService;
+    private final ZbRealnameAuthService zbRealnameAuthService;
 
     @Override
     //@Cacheable
@@ -189,7 +188,63 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
      */
     @Override
     public ZbShop queryAllById(Integer shopId) {
-        ZbShop zbShop = zbShopMapper.selectById(shopId);
+
+
+        ZbShop zbShop = zbShopMapper.getShopByid1(shopId);
+
+
+        Map<String, Object> maps = new HashMap<>();
+
+        @NotNull Integer uid = zbShop.getUid();
+        //获取认证状态
+        //1：邮箱认证
+        ZbUsers users = zbUsersService.getById(uid);
+        if(users!=null) {
+            @NotNull Integer emailStatus = users.getEmailStatus();
+            if (emailStatus == 2) {
+                maps.put("邮箱认证", true);
+            }
+        }
+        maps.put("邮箱认证",false);
+        //实名认证
+        ZbRealnameAuth zbRealnameAuthP =  zbRealnameAuthService.getByUid(uid,1);
+        if(zbRealnameAuthP!=null) {
+            @NotNull Integer realNameStatusP = zbRealnameAuthP.getStatus();
+            if (realNameStatusP == 1) {
+                maps.put("实名认证", true);
+            }
+        }
+            maps.put("实名认证", false);
+
+        //企业认证
+        ZbRealnameAuth zbRealnameAuthC =  zbRealnameAuthService.getByUid(uid,1);
+        if(zbRealnameAuthC!=null) {
+            @NotNull Integer realNameStatusC = zbRealnameAuthC.getStatus();
+            if (realNameStatusC == 1) {
+                maps.put("企业认证", true);
+            }
+        }
+        maps.put("企业认证",false);
+
+        //支付宝认证
+        ZbAlipayAuth zbAlipayAuth = zbAlipayAuthService.getByUid(uid);
+        if(zbAlipayAuth!=null) {
+            Integer aliStatus = zbAlipayAuth.getStatus();
+            if (aliStatus == 2) {
+                maps.put("支付宝认证", true);
+            }
+        }
+        maps.put("支付宝认证",false);
+        //银行认证
+        ZbBankAuth zbBankAuth = zbBankAuthService.getByUid(uid);
+        if(zbAlipayAuth!=null) {
+            Integer bankStatus = zbBankAuth.getStatus();
+            if (bankStatus == 2) {
+                maps.put("银行认证", true);
+            }
+        }
+        maps.put("银行认证",false);
+        zbShop.setAuthenticationMap(maps);
         return zbShop;
     }
 
@@ -289,9 +344,30 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
      * @return
      */
     @Override
-    public ZbEmployCommentAdvice getEvaluateByShopId(String shopId, Pageable pageable) {
-        zbEmployCommentService.getEvaluateByShopId(shopId,pageable);
-        return null;
+    public Map<String,Object> getEvaluateByShopId(String shopId, Pageable pageable) {
+
+        List<ZbEmployCommentAdvice> evaluateByShopId = zbEmployCommentService.getEvaluateByShopId(shopId, pageable);
+        double speedScore = 0;
+        double qualityScore = 0;
+        double attitudeScore = 0;
+        if(evaluateByShopId!=null && evaluateByShopId.size()>0){
+            for (ZbEmployCommentAdvice zbEmployCommentAdvice : evaluateByShopId) {
+                //速度得分
+                speedScore+=zbEmployCommentAdvice.getSpeedScore();
+                //质量得分
+                qualityScore+=zbEmployCommentAdvice.getQualityScore();
+                //态度得分
+                attitudeScore+=zbEmployCommentAdvice.getAttitudeScore();
+            }
+            speedScore/=evaluateByShopId.size();
+            qualityScore/=evaluateByShopId.size();
+            attitudeScore/=evaluateByShopId.size();
+        }
+        LinkedHashMap<String , Object> linkedHashMap = new LinkedHashMap<>(2);
+        linkedHashMap.put("速度得分",speedScore);
+        linkedHashMap.put("质量得分",qualityScore);
+        linkedHashMap.put("态度得分",attitudeScore);
+        return linkedHashMap;
     }
 
 

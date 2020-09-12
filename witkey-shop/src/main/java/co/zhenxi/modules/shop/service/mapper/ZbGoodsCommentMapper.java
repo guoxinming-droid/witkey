@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author guoke
@@ -40,5 +41,18 @@ public interface ZbGoodsCommentMapper extends CoreMapper<ZbGoodsComment> {
             "\tLEFT JOIN zb_users AS u ON gc.uid = u.id\n" +
             "\tLEFT JOIN zb_user_detail AS ud ON gc.uid = ud.id  ${whereSql}")
     List<ZbGoodsComment> getGoodsCommentByGoodId(String whereSql);
+    @Select("SELECT\n" +
+            "\tconcat\n" +
+            "\t((select count(1)  from zb_goods_comment where zb_goods_comment.goods_id =#{goodsId} and type = 0)/count( 1 )*100,\"%\") AS '好评率',\n" +
+            "\tavg( speed_score ) AS '速度得分',\n" +
+            "\tavg(quality_score) as '质量得分',\n" +
+            "\tavg(attitude_score) as '态度得分'\n" +
+            "FROM\n" +
+            "\tzb_goods_comment \n" +
+            "WHERE\n" +
+            "\tzb_goods_comment.goods_id = #{goodsId}")
+    Map<String, Object> getAnyCommentByGoodsId(Integer goodsId);
 
+    @Select("select count(1) as '好评数量' from zb_goods_comment where zb_goods_comment.goods_id =#{goodsId} and type = 0")
+    Map<String, Object> getGoodCommentByGoodsId(Integer goodsId);
 }

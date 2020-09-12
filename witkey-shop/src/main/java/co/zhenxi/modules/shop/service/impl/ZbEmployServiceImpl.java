@@ -10,9 +10,11 @@ import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.modules.shop.domain.ZbEmploy;
+import co.zhenxi.modules.shop.domain.ZbEmployLocal;
 import co.zhenxi.modules.shop.service.ZbEmployService;
 import co.zhenxi.modules.shop.service.dto.ZbEmployDto;
 import co.zhenxi.modules.shop.service.dto.ZbEmployQueryCriteria;
+import co.zhenxi.modules.shop.service.mapper.ZbEmployLoaclMapper;
 import co.zhenxi.modules.shop.service.mapper.ZbEmployMapper;
 import co.zhenxi.utils.FileUtil;
 import com.github.pagehelper.PageInfo;
@@ -23,7 +25,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,6 +50,8 @@ public class ZbEmployServiceImpl extends BaseServiceImpl<ZbEmployMapper, ZbEmplo
 
     private final IGenerator generator;
     private final ZbEmployMapper zbEmployMapper;
+
+    private final ZbEmployLoaclMapper zbEmployLoaclMapper;
 
     @Override
     //@Cacheable
@@ -115,5 +121,27 @@ public class ZbEmployServiceImpl extends BaseServiceImpl<ZbEmployMapper, ZbEmplo
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void InsertEmploy(ZbEmploy zbEmploy, Integer[] ids) {
+        //未托管
+        zbEmploy.setBountyStatus(0);
+        //gu用建立
+        zbEmploy.setStatus(0);
+        zbEmploy.setEmployPercentage(0);
+        zbEmploy.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        zbEmploy.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+        zbEmployMapper.insert(zbEmploy);
+        Integer id = zbEmploy.getId();
+        @NotNull Integer employerUid = zbEmploy.getEmployerUid();
+        for (int i = 0; i < ids.length; i++) {
+            ZbEmployLocal zbEmployLocal = new ZbEmployLocal();
+            zbEmployLocal.setEmployId(id);
+            zbEmployLocal.setLocalId(ids[i]);
+            zbEmployLocal.setUid(employerUid);
+            zbEmployLoaclMapper.insert(zbEmployLocal);
+        }
     }
 }

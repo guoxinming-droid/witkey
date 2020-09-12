@@ -67,5 +67,11 @@ public interface ZbRealnameAuthService  extends BaseService<ZbRealnameAuth>{
      */
     void onStatus(Integer id, int status);
 
-
+    /**
+     * 根据用户Id
+     * @param uid
+     * @param i
+     * @return
+     */
+    ZbRealnameAuth getByUid(Integer uid, int i);
 }

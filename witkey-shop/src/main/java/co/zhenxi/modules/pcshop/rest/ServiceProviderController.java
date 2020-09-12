@@ -2,8 +2,11 @@ package co.zhenxi.modules.pcshop.rest;
 
 import co.zhenxi.annotation.AnonymousAccess;
 import co.zhenxi.logging.aop.log.Log;
+import co.zhenxi.modules.shop.service.ZbGoodsCommentService;
 import co.zhenxi.modules.shop.service.ZbGoodsService;
+import co.zhenxi.modules.shop.service.ZbShopOrderService;
 import co.zhenxi.modules.shop.service.ZbShopService;
+import co.zhenxi.modules.shop.service.dto.ZbGoodsCommentQueryCriteria;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,9 +27,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/serviceProvider")
 public class ServiceProviderController {
 
-    private  final ZbShopService zbShopService;
+    private final ZbShopService zbShopService;
 
     private final ZbGoodsService zbGoodsService;
+
+    private final ZbGoodsCommentService zbGoodsCommentService;
+
+    private final ZbShopOrderService zbShopOrderService;
 
 
     @Log("条件搜索服务商")
@@ -45,13 +52,13 @@ public class ServiceProviderController {
     @ApiOperation("服务商详情页")
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
-    @PostMapping("/getServiceProviderById")
+    @GetMapping("/getServiceProviderById")
     public ResponseEntity<Object> getServiceProviderById(Integer shopId) throws Exception {
         return new ResponseEntity<>(zbShopService.queryAllById(shopId), HttpStatus.OK);
     }
 
-    @Log("服务商作品")
-    @ApiOperation("服务商作品")
+    @Log("服务商作品及服务")
+    @ApiOperation("服务商作品及服务")
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
     @GetMapping("/getGoodsById")
@@ -86,17 +93,15 @@ public class ServiceProviderController {
     @AnonymousAccess
     @GetMapping("/getSuccessCaseCount")
     public ResponseEntity<Object> getSuccessCaseCount(@RequestParam("shopId") String shopId,Pageable pageable) throws Exception {
-
         return new ResponseEntity<>(zbShopService.getSuccessCaseCount(shopId,pageable), HttpStatus.OK);
     }
 
-    @Log("成功案例计数")
-    @ApiOperation("成功案例计数")
+    @Log("获取店铺评价")
+    @ApiOperation("获取店铺评价")
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
     @GetMapping("/getEvaluateByShopId")
     public ResponseEntity<Object> getEvaluateByShopId(@RequestParam("shopId") String shopId,Pageable pageable) throws Exception {
-
         return new ResponseEntity<>(zbShopService.getEvaluateByShopId(shopId,pageable), HttpStatus.OK);
     }
 
@@ -120,5 +125,67 @@ public class ServiceProviderController {
 
         return new ResponseEntity<>(zbGoodsService.getGoodsScoreByShopId(shopId), HttpStatus.OK);
     }
+
+    @Log("店铺好评差评")
+    @ApiOperation("店铺好评差评")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @GetMapping("/getGoodsScoreByShopIdAndType")
+    public ResponseEntity<Object> getGoodsScoreByShopIdAndType(@RequestParam("shopId") Integer shopId,Integer type) throws Exception {
+        return new ResponseEntity<>(zbGoodsService.getGoodsScoreByShopIdAndType(shopId,type), HttpStatus.OK);
+    }
+
+
+//    @Log("获取店铺详情")
+//    @ApiOperation("获取店铺详情")
+//    //@PreAuthorize("@el.check('admin','zbAd:del')")
+//    @AnonymousAccess
+//    @GetMapping("/getShopById")
+//    public ResponseEntity<Object> getShopById(@RequestParam("shopId") Integer shopId) throws Exception {
+//        return new ResponseEntity<>(zbShopService.getShopById(shopId), HttpStatus.OK);
+//    }
+
+    @Log("作品服务详情")
+    @ApiOperation("作品服务详情")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @GetMapping("/getGoodsByType")
+    public ResponseEntity<Object> getGoodsByType(@RequestParam("goodsId")Integer goodsId) throws Exception {
+        return new ResponseEntity<>(zbGoodsService.getGoodsByType(goodsId), HttpStatus.OK);
+    }
+
+    @Log("作品服务评价")
+    @ApiOperation("作品服务评价")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @GetMapping("/getGoodsByType/comment")
+    public ResponseEntity<Object> getGoodsCommentById(ZbGoodsCommentQueryCriteria zbGoodsCommentQueryCriteria,
+                                                       Pageable pageable) throws Exception {
+        Integer type = zbGoodsCommentQueryCriteria.getType();
+        if(type == null){
+            zbGoodsCommentQueryCriteria.setType(0);
+        }
+        return new ResponseEntity<>(zbGoodsCommentService.queryAllAndComment(zbGoodsCommentQueryCriteria,pageable), HttpStatus.OK);
+    }
+
+
+    @Log("店铺其他作品")
+    @ApiOperation("店铺其他作品")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @GetMapping("/getGoodsNotByGoodsId")
+    public ResponseEntity<Object> getGoodsByGoodsId(@RequestParam("goodsId") Integer goodsId,Pageable pageable) throws Exception {
+        return new ResponseEntity<>(zbGoodsService.getGoodsByGoodsId(goodsId,pageable), HttpStatus.OK);
+    }
+
+    @Log("提交订单")
+    @ApiOperation("提交订单")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @PostMapping("/GoodsPutOrder")
+    public ResponseEntity<Object> GoodsPutOrder(@RequestParam("goodsId") Integer goodsId,Pageable pageable) throws Exception {
+        return new ResponseEntity<>(zbGoodsService.GoodsPutOrder(goodsId,pageable), HttpStatus.OK);
+    }
+
 
 }

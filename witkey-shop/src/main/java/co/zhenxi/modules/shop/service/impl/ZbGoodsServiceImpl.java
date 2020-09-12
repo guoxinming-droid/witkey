@@ -10,16 +10,24 @@ import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.modules.shop.domain.ZbGoods;
+import co.zhenxi.modules.shop.domain.ZbGoodsAdvice;
 import co.zhenxi.modules.shop.domain.ZbGoodsComment;
+import co.zhenxi.modules.shop.domain.ZbShop;
 import co.zhenxi.modules.shop.service.ZbGoodsCommentService;
 import co.zhenxi.modules.shop.service.ZbGoodsService;
+import co.zhenxi.modules.shop.service.ZbShopService;
 import co.zhenxi.modules.shop.service.dto.ZbGoodsDto;
 import co.zhenxi.modules.shop.service.dto.ZbGoodsQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbGoodsMapper;
+import co.zhenxi.modules.shop.service.mapper.ZbShopMapper;
+import co.zhenxi.utils.BeanUtil;
 import co.zhenxi.utils.FileUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.util.PropertiesUtil;
+import org.apache.poi.hssf.record.DVALRecord;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,10 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 
 // 默认不使用缓存
 //import org.springframework.cache.annotation.CacheConfig;
@@ -50,18 +56,37 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
     private final IGenerator generator;
     private final ZbGoodsMapper zbGoodsMapper;
     private final ZbGoodsCommentService zbGoodsCommentService;
+    private final ZbShopMapper zbShopMapper;
 
     @Override
     //@Cacheable
     public Map<String, Object> queryAll(ZbGoodsQueryCriteria criteria, Pageable pageable) {
         getPage(pageable);
+        if(criteria.getIs_delete() == null){
+            criteria.setIs_delete(0);
+        }
         PageInfo<ZbGoods> page = new PageInfo<>(queryAll(criteria));
         Map<String, Object> map = new LinkedHashMap<>(2);
-        map.put("content", generator.convert(page.getList(), ZbGoodsDto.class));
+        List<ZbGoods> list = page.getList();
+        map.put("content", generator.convert(copyZbGoods(list), ZbGoodsAdvice.class));
         map.put("totalElements", page.getTotal());
         return map;
     }
 
+    private List<ZbGoodsAdvice> copyZbGoods(List<ZbGoods> list){
+        ArrayList<ZbGoodsAdvice> zbGoodsAdvices = new ArrayList<>();
+        for (ZbGoods zbGoods : list) {
+            Map<String ,Object>  map = zbShopMapper.selectByGoodsId(zbGoods.getId());
+            System.out.println(map);
+            ZbGoodsAdvice zbGoodsAdvice = new ZbGoodsAdvice();
+            BeanUtils.copyProperties(zbGoods,zbGoodsAdvice);
+            String cityName = (String)map.get("cityNmae");
+            zbGoodsAdvice.setCityName(cityName);
+            System.out.println(zbGoodsAdvice.getCityName());
+            zbGoodsAdvices.add(zbGoodsAdvice);
+        }
+        return zbGoodsAdvices;
+    }
 
     @Override
     //@Cacheable
@@ -179,10 +204,13 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
      * @return
      */
     @Override
-    public Map<String, Object> getGoods(Pageable size) {
-
+    public Map<String, Object> getGoods(Pageable size,Integer type) {
+        String sql = "";
         getPage(size);
-        Page<ZbGoods> page = zbGoodsMapper.getGoods();
+        if(type !=null){
+            sql = "and type = "+ type;
+        }
+        Page<ZbGoods> page = zbGoodsMapper.getGoods(sql);
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getResult(), ZbGoods.class));
         map.put("totalElements", page.getTotal());
@@ -236,6 +264,63 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
         linkedHashMap.put("态度得分",attitudeScore);
 
         return linkedHashMap;
+    }
+
+    /**
+     * 获取好评差评
+     *
+     * @param shopId
+     * @param type
+     * @return
+     */
+    @Override
+    public List<ZbGoodsComment> getGoodsScoreByShopIdAndType(Integer shopId, Integer type) {
+        List<ZbGoodsComment> goodsCommentByGoodId = zbGoodsCommentService.getGoodsCommentByGoodId(shopId, type);
+        return goodsCommentByGoodId;
+    }
+
+    /**
+     * 获取商品分类
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getGoodsType() {
+        return  zbGoodsMapper.getGoodsType();
+
+    }
+
+    @Override
+    public ZbGoodsAdvice getGoodsByType(Integer goodsId) {
+        return zbGoodsMapper.getGoodsByType(goodsId);
+    }
+
+    /**
+     * 获取其他店铺作品
+     *
+     * @param goodsId
+     * @param pageable
+     * @return
+     */
+    @Override
+    public List<ZbGoods> getGoodsByGoodsId(Integer goodsId, Pageable pageable) {
+        getPage(pageable);
+        Page<ZbGoods> page = zbGoodsMapper.getGoodsByOther(goodsId);
+        return page.getResult();
+    }
+
+    /**
+     * 订单前数据回显
+     *
+     * @param goodsIds
+     * @param pageable
+     * @return
+     */
+    @Override
+    public Map<String ,Object>  GoodsPutOrder(Integer goodsIds, Pageable pageable) {
+        Map<String, Object> stringObjectMap = zbGoodsMapper.selectGoodsById(goodsIds);
+        stringObjectMap.put("count",1);
+        return  stringObjectMap;
     }
 
 

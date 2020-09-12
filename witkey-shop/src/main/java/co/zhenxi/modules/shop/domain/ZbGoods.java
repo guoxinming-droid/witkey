@@ -10,6 +10,8 @@ import lombok.Data;
 import com.baomidou.mybatisplus.annotation.TableName;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import lombok.EqualsAndHashCode;
+
 import javax.validation.constraints.*;
 import java.sql.Timestamp;
 import java.math.BigDecimal;
@@ -21,7 +23,15 @@ import java.io.Serializable;
 */
 @Data
 @TableName("zb_goods")
+@EqualsAndHashCode
 public class ZbGoods implements Serializable {
+
+
+    /**
+     * types 属性我放到子类里面了 要不sql报错
+     *  有用到 types字段的 可以用 子类接收
+     */
+
 
     @TableId
     private Integer id;
@@ -54,10 +64,12 @@ public class ZbGoods implements Serializable {
     @NotNull
     private Integer type;
 
-    private String types;
+
 
     @NotNull
     private BigDecimal cash;
+
+    private Integer catePid;
 
 
     /** 商品封面 */
@@ -137,7 +149,7 @@ public class ZbGoods implements Serializable {
     @NotBlank
     private String des;
 
-    private String userName;
+
 
 
     public void copy(ZbGoods source){

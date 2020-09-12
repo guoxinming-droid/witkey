@@ -106,4 +106,16 @@ public class ZbAlipayAuthServiceImpl extends BaseServiceImpl<ZbAlipayAuthMapper,
     public void onStatus(Integer id, int status) {
         zbAlipayAuthMapper.updateOnstatus(id,status);
     }
+
+    /**
+     * 根据用户名获取
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public ZbAlipayAuth getByUid(Integer uid) {
+
+        return zbAlipayAuthMapper.getByUid(uid);
+    }
 }

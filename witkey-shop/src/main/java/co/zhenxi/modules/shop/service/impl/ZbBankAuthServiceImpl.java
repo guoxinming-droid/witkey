@@ -110,5 +110,17 @@ public class ZbBankAuthServiceImpl extends BaseServiceImpl<ZbBankAuthMapper, ZbB
         zbBankAuthMapper.updateOnstatus(id,status);
     }
 
+    /**
+     * 根据用户ID
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public ZbBankAuth getByUid(Integer uid) {
+
+        return zbBankAuthMapper.getByUid(uid);
+    }
+
 
 }
