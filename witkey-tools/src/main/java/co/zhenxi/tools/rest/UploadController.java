@@ -53,6 +53,7 @@ public class UploadController {
     public ResponseEntity<Object> create(@RequestParam(defaultValue = "name") String name, @RequestParam("files") MultipartFile[] files) {
         StringBuilder url = new StringBuilder();
         Map<String, Object> map = new HashMap<>(2);
+        System.out.println(localUrl+"this is localUrl for pic ====================================================================");
         if (StrUtil.isNotEmpty(localUrl)) { //存在走本地
             for (MultipartFile file : files) {
                 LocalStorageDto localStorageDTO = localStorageService.create(name, file);

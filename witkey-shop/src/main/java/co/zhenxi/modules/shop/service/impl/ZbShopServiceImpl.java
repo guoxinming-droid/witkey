@@ -370,5 +370,28 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
         return linkedHashMap;
     }
 
+    /**
+     * 根据用户获取ID
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public ZbShop getshopByuid(Integer uid) {
+        return zbShopMapper.getshopByuid(uid);
+    }
+
+    /**
+     * 收藏店铺
+     *
+     * @param uid
+     * @param shopId
+     * @return
+     */
+    @Override
+    public void CollectionShop(Integer uid, Integer shopId) {
+        zbShopMapper.CollectionShop(uid,shopId);
+    }
+
 
 }

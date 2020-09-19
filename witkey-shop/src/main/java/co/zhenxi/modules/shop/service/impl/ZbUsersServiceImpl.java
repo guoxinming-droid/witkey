@@ -10,6 +10,7 @@ import co.zhenxi.modules.shop.domain.ZbUsers;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.tools.domain.vo.EmailVo;
 import co.zhenxi.tools.service.EmailConfigService;
+import co.zhenxi.tools.utils.MD5Util;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
@@ -232,5 +233,35 @@ public class ZbUsersServiceImpl extends BaseServiceImpl<ZbUsersMapper, ZbUsers> 
         zbUsers.setPassword(password);
         UpdateWrapper<ZbUsers> zbUsersUpdateWrapper = new UpdateWrapper<ZbUsers>().eq("zb_users.id",id);
         zbUsersMapper.update(zbUsers,zbUsersUpdateWrapper);
+    }
+
+    /**
+     * 登录
+     *
+     * @param zbUsers
+     */
+    @Override
+    public ZbUsers login(ZbUsers zbUsers) {
+        String name = zbUsers.getName();
+        String password = zbUsers.getPassword();
+        //记住密码返回是加密后的 判断是否是加密过的密码
+        if(password.length()==32){
+            ZbUsers select = zbUsersMapper.select(name, password);
+            if (select == null) {
+                throw new RuntimeException("用户名或密码不正确");
+            }
+            return select;
+        }else {
+            String md5password = MD5Util.md5Encrypt32Lower(password);
+            if (name == null || password == null) {
+                throw new RuntimeException("用户名或密码不正确");
+            }
+            ZbUsers zbUsers1 = zbUsersMapper.select(name, md5password);
+
+            if (zbUsers1 == null) {
+                throw new RuntimeException("用户名或密码不正确");
+            }
+            return zbUsers1;
+        }
     }
 }

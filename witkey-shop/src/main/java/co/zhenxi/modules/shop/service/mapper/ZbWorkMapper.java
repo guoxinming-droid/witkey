@@ -28,8 +28,8 @@ public interface ZbWorkMapper extends CoreMapper<ZbWork> {
    List<ZbWork> getWorkByTaskId(long taskId);
 
 
-    @Select("select * from zb_work where status = 2")
-    Page<ZbWork> getWorkAll();
+    @Select("select * from zb_work where status = 2 ${orderSql} ")
+    Page<ZbWork> getWorkAll(String orderSql);
 
     @Insert("<script>" +
             "insert into zb_work<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n" +

@@ -21,5 +21,6 @@ import org.springframework.stereotype.Repository;
 public interface ZbUsersMapper extends CoreMapper<ZbUsers> {
     @Select("select * from zb_users where mobile = #{mobile}")
     ZbUsers selectByMobile(String mobile);
-
+    @Select("select * from zb_users where name = #{name} and password = #{password}")
+    ZbUsers select(String name, String password);
 }

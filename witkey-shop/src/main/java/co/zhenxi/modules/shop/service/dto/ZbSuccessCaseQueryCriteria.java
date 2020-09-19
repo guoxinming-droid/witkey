@@ -29,6 +29,11 @@ public class ZbSuccessCaseQueryCriteria{
     /** 精确 */
     @Query
     private Integer type;
+
+    /** 精确 */
+    @Query
+    private Integer cateId;
+
     /** BETWEEN */
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> createTime;

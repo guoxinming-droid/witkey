@@ -95,16 +95,19 @@ public interface ZbShopMapper extends CoreMapper<ZbShop> {
     List<String> getCollectShop1(Integer uid,Integer shopId);
 
     @Select("SELECT\n" +
-            "\tzbs.id,\n" +
-            "\tzbs.shop_pic \n" +
+            "\tzb_shop.id,\n" +
+            "\tzb_shop.shop_name,\n" +
+            "\tzb_shop.uid,\n" +
+            "\tzb_shop.shop_pic \n" +
             "FROM\n" +
-            "\tzb_shop zbs,\n" +
-            "\tzb_vipshop_order zbvo \n" +
+            "\tzb_shop,\n" +
+            "\tzb_shop_package \n" +
             "WHERE\n" +
-            "\tzbs.id = zbvo.shop_id \n" +
-            "\tAND zbvo.STATUS = 1 \n" +
-            "ORDER BY\n" +
-            "\tzbvo.package_id DESC")
+            "\tzb_shop.id = zb_shop_package.shop_id \n" +
+            "\tAND zb_shop_package.package_id != 0 \n" +
+            "\tAND zb_shop.STATUS = 1 \n" +
+            "\tAND zb_shop.is_recommend = 1 \n" +
+            "\tAND zb_shop_package.end_time > NOW( )")
     Page<Map<String, Object>> getShopByVip();
 
     @Select("select zs.*,zd.name sName from zb_shop zs,zb_district zd where zs.is_recommend = 1   and zs.city= zd.id order by zs.good_comment desc")
@@ -132,4 +135,9 @@ public interface ZbShopMapper extends CoreMapper<ZbShop> {
             "\tAND zb_goods.id = #{id}")
     Map<String,Object> selectByGoodsId(Integer id);
 
+    @Select("select * from zb_shop where uid = #{uid} ")
+    ZbShop getshopByuid(Integer uid);
+
+    @Insert("insert into zb_shop_focus values(null, #{uid},#{shopId},NOW())")
+    void CollectionShop(Integer uid, Integer shopId);
 }

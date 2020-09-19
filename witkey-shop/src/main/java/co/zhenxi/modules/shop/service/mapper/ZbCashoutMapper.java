@@ -66,6 +66,16 @@ public interface ZbCashoutMapper extends CoreMapper<ZbCashout> {
             "\tAND c.created_at <= #{endTime}")
     List<ZbCashout> cashoutList(String cashoutType, String userName, String startTime, String endTime);
 
-    @Select("select zbu.name name,zbc.cash cash,zbc.created_at time from zb_cashout zbc, zb_users zbu where zbc.uid = zbu.id  order by zbc.created_at desc")
+    @Select("SELECT\n" +
+            "\tzbu.NAME NAME,\n" +
+            "\tzbc.cash cash,\n" +
+            "\tifnull(zbc.created_at,NOW()) time \n" +
+            "FROM\n" +
+            "\tzb_cashout zbc,\n" +
+            "\tzb_users zbu \n" +
+            "WHERE\n" +
+            "\tzbc.uid = zbu.id \n" +
+            "ORDER BY\n" +
+            "\tzbc.created_at DESC")
     Page<Map<String, Object>> getCashout();
 }

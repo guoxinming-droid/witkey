@@ -10,8 +10,11 @@ import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbPackage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
 * @author Guoxm
@@ -23,5 +26,11 @@ public interface ZbPackageMapper extends CoreMapper<ZbPackage> {
 
     @Update( "update zb_package set status = #{status} where id = #{id}")
     void updateOnstatus(@Param("status") int status, @Param("id") int id);
+
+    @Select("select * from zb_package where status = 0 order by price")
+    List<ZbPackage> getPackage();
+
+    @Select("select id,title,price from zb_package where status = 0 order by price asc")
+    List<ZbPackage> getVipInfoT();
 
 }

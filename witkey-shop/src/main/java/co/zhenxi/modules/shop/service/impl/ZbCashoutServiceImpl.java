@@ -134,7 +134,6 @@ public class ZbCashoutServiceImpl extends BaseServiceImpl<ZbCashoutMapper, ZbCas
         getPage(size);
         HashMap<String, Object> map = new HashMap<>(2);
         Page<Map<String,Object>> page = zbCashoutMapper.getCashout();
-        //System.out.println(page.getList());
         map.put("content", page.getResult());
         map.put("totalElements", page.getTotal());
         return map;

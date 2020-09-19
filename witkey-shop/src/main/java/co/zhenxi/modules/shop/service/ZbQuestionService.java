@@ -78,4 +78,12 @@ public interface ZbQuestionService  extends BaseService<ZbQuestion>{
      * @param status
      */
     Boolean onStatus(Integer id, int status);
+
+    Map<String,Object> getQuestion(Integer status,Pageable pageable);
+
+    /**
+     * 获取已解决得问题数量
+     * @return
+     */
+    long getQuestionCount();
 }

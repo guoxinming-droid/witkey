@@ -28,7 +28,7 @@ public class AlipayUtils {
      * 生成订单号
      * @return String
      */
-    public String getOrderCode() {
+    public static String getOrderCode() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int a = (int)(Math.random() * 9000.0D) + 1000;
         System.out.println(a);
@@ -48,7 +48,7 @@ public class AlipayUtils {
      * @param alipay 阿里云配置
      * @return boolean
      */
-    public boolean rsaCheck(HttpServletRequest request, AlipayConfig alipay){
+    public static boolean rsaCheck(HttpServletRequest request, AlipayConfig alipay){
 
         // 获取支付宝POST过来反馈信息
         Map<String,String> params = new HashMap<>(1);

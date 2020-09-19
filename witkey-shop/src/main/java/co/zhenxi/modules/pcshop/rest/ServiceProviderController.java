@@ -178,13 +178,26 @@ public class ServiceProviderController {
         return new ResponseEntity<>(zbGoodsService.getGoodsByGoodsId(goodsId,pageable), HttpStatus.OK);
     }
 
-    @Log("提交订单")
-    @ApiOperation("提交订单")
+    @Log("提交订单前回显")
+    @ApiOperation("提交订单前回显")
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
     @PostMapping("/GoodsPutOrder")
-    public ResponseEntity<Object> GoodsPutOrder(@RequestParam("goodsId") Integer goodsId,Pageable pageable) throws Exception {
-        return new ResponseEntity<>(zbGoodsService.GoodsPutOrder(goodsId,pageable), HttpStatus.OK);
+    public ResponseEntity<Object> GoodsPutOrder(@RequestParam("goodsId") Integer[] goodsIds,Pageable pageable) throws Exception {
+//        for (int i = 0; i < goodsIds.length; i++) {
+//            System.out.println(goodsIds[i]);
+//        }
+        return new ResponseEntity<>(zbGoodsService.GoodsPutOrder(goodsIds,pageable), HttpStatus.OK);
+    }
+
+    @Log("收藏店铺")
+    @ApiOperation("收藏店铺")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @PostMapping("/CollectionShop")
+    public ResponseEntity<Object> CollectionShop(@RequestParam("uid") Integer uid,@RequestParam("shopId") Integer shopId) throws Exception {
+        zbShopService.CollectionShop(uid,shopId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

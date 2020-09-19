@@ -10,6 +10,7 @@ import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.modules.shop.domain.ZbSuccessCase;
+import co.zhenxi.modules.shop.domain.ZbSuccessCaseAdcice;
 import co.zhenxi.modules.shop.service.ZbSuccessCaseService;
 import co.zhenxi.modules.shop.service.dto.ZbSuccessCaseDto;
 import co.zhenxi.modules.shop.service.dto.ZbSuccessCaseQueryCriteria;
@@ -24,7 +25,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -135,9 +139,35 @@ public class ZbSuccessCaseServiceImpl extends BaseServiceImpl<ZbSuccessCaseMappe
         getPage(size);
         Page<ZbSuccessCase> page = zbSuccessCaseMapper.getSuccessStories();
         Map<String, Object> map = new LinkedHashMap<>(2);
-        map.put("content", generator.convert(page.getResult(), ZbSuccessCase.class));
+        List<ZbSuccessCase> result = page.getResult();
+        for (ZbSuccessCase zbSuccessCase : result) {
+            @NotNull BigDecimal cash = zbSuccessCase.getCash();
+            BigDecimal bigDecimal = cash.setScale(2, RoundingMode.HALF_UP);
+            System.out.println(bigDecimal.toString());
+            //System.out.println(value);
+            zbSuccessCase.setCash(bigDecimal);
+        }
+        map.put("content", generator.convert(result, ZbSuccessCase.class));
         map.put("totalElements", page.getTotal());
         return map;
+    }
+
+    /**
+     * 根据一级标签
+     *
+     * @param catePid
+     * @param pageable
+     * @return
+     */
+    @Override
+    public Map<String, Object> getServiceProviderByCatePid(Integer catePid, Pageable pageable) {
+        getPage(pageable);
+        Page<ZbSuccessCaseAdcice> page = zbSuccessCaseMapper.getServiceProviderByCatePid(catePid);
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(page.getResult(), ZbSuccessCaseAdcice.class));
+        map.put("totalElements", page.getTotal());
+        return map;
+
     }
 
 

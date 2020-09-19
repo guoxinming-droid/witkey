@@ -9,6 +9,7 @@ package co.zhenxi.modules.shop.service.impl;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
+import co.zhenxi.modules.shop.domain.ZbTask;
 import co.zhenxi.modules.shop.domain.ZbUsers;
 import co.zhenxi.modules.shop.domain.ZbWork;
 import co.zhenxi.modules.shop.service.ZbUsersService;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -105,10 +107,18 @@ public class ZbWorkServiceImpl extends BaseServiceImpl<ZbWorkMapper, ZbWork> imp
     @Override
     public Map<String, Object> getWorkAll(Pageable size) {
         getPage(size);
+        String orderSql = "";
+        if(size.getSort() == null){
+            orderSql = "order by bid_at desc ";
+        }
         //PageHelper.startPage(1,size);
-        Page<ZbWork> page = zbWorkMapper.getWorkAll();
+        Page<ZbWork> page = zbWorkMapper.getWorkAll(orderSql);
+        List<ZbWork> list = page.getResult();
+        for (ZbWork zbWork : list) {
+            zbWork.setPrice(zbWork.getPrice().setScale(2, RoundingMode.HALF_UP));
+        }
         HashMap<String, Object> map = new HashMap<>();
-        map.put("content", generator.convert(page.getResult(), ZbWork.class));
+        map.put("content", generator.convert(list, ZbWork.class));
         map.put("totalElements", page.getTotal());
 
         return map;

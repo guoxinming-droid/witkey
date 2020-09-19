@@ -61,6 +61,9 @@ public class ZbPackage implements Serializable {
     @NotNull
     private Integer typeStatus;
 
+    /** 套餐价格*/
+    private double price;
+
 
     /** 创建时间 */
     @NotNull

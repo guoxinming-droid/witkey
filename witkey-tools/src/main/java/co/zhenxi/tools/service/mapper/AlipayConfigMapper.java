@@ -8,6 +8,7 @@ package co.zhenxi.tools.service.mapper;
 import co.zhenxi.tools.domain.AlipayConfig;
 import co.zhenxi.common.mapper.CoreMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,5 +18,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface AlipayConfigMapper extends CoreMapper<AlipayConfig> {
-
+    @Update("update trade set status = 1 where outTradeNo = #{outTradeNo}")
+    void updateOutTradeNo(String outTradeNo);
 }

@@ -15,6 +15,7 @@ import co.zhenxi.modules.shop.service.dto.ZbQuestionDto;
 import co.zhenxi.modules.shop.service.dto.ZbQuestionQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbQuestionMapper;
 import co.zhenxi.utils.FileUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 // 默认不使用缓存
 //import org.springframework.cache.annotation.CacheConfig;
@@ -128,6 +128,47 @@ public class ZbQuestionServiceImpl extends BaseServiceImpl<ZbQuestionMapper, ZbQ
     @Override
     public Boolean onStatus(Integer id, int status) {
         return  zbQuestionMapper.updateOnstatus(id,status);
+    }
+
+    @Override
+    public Map<String, Object> getQuestion(Integer status,Pageable pageable) {
+        getPage(pageable);
+        String whereSql = "and zb_question.status NOT IN ( 1,5 )";
+        if(status != null && (status > 0 && status <= 5)){
+            whereSql = "and zb_question.status = "+status;
+        }
+        Page<Map<String, Object>> question = zbQuestionMapper.getQuestion(whereSql);
+        List<Map<String, Object>> result = question.getResult();
+        for (Map<String, Object> stringObjectMap : result) {
+            Long id = (Long)stringObjectMap.get("id");
+            Long count = zbQuestionMapper.getQuestionAnswer(id);
+            stringObjectMap.put("回答",count);
+            Timestamp time = (Timestamp)stringObjectMap.get("time");
+            long timeDifference = System.currentTimeMillis() - time.getTime();
+            stringObjectMap.put("timeDifference",timeDifference);
+            /**
+             * Date date = new Date(time.getTime());
+            System.out.println(date.toString());
+            SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String format = sim.format(date);
+            System.out.println(format);
+             */
+        }
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content",result);
+        map.put("totalElements", question.getTotal());
+        return map;
+    }
+
+    /**
+     * 获取已解决得问题数量
+     *
+     * @return
+     */
+    @Override
+    public long getQuestionCount() {
+
+        return zbQuestionMapper.getQuestionCount();
     }
 
 }

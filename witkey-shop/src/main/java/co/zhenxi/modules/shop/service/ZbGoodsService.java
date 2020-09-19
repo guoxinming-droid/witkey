@@ -150,5 +150,5 @@ public interface ZbGoodsService  extends BaseService<ZbGoods>{
      * @param pageable
      * @return
      */
-    Map<String ,Object> GoodsPutOrder(Integer goodsIds, Pageable pageable);
+    List<Map<String, Object>> GoodsPutOrder(Integer[] goodsIds, Pageable pageable);
 }

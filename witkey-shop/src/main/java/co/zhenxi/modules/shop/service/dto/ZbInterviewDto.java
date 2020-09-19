@@ -6,6 +6,7 @@
 */
 package co.zhenxi.modules.shop.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.sql.Timestamp;
 import java.io.Serializable;
@@ -47,8 +48,10 @@ public class ZbInterviewDto implements Serializable {
     private Integer list;
 
     /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Timestamp createdAt;
 
     /** 修改时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Timestamp updatedAt;
 }

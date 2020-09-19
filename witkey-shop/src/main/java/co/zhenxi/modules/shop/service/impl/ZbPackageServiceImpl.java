@@ -97,4 +97,14 @@ public class ZbPackageServiceImpl extends BaseServiceImpl<ZbPackageMapper, ZbPac
 
         zbPackageMapper.updateOnstatus(status,id);
     }
+
+    /**
+     * 查询全部不分页
+     *
+     * @return
+     */
+    @Override
+    public List<ZbPackage> getPackage() {
+        return zbPackageMapper.getPackage();
+    }
 }

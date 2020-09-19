@@ -91,6 +91,7 @@ public class WxpayConfigController {
     @RequestMapping("/gowechatpay")
     @AnonymousAccess
     public Object goWeChatPay(@RequestParam("orderId") String orderId, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        System.out.println(orderId);
         return wxpayConfigService.goWeChatPay(orderId, request);
     }
 

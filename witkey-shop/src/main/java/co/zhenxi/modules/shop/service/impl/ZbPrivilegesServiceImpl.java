@@ -9,11 +9,16 @@ package co.zhenxi.modules.shop.service.impl;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
+import co.zhenxi.modules.shop.domain.ZbPackAdvice;
+import co.zhenxi.modules.shop.domain.ZbPackage;
 import co.zhenxi.modules.shop.domain.ZbPrivileges;
+import co.zhenxi.modules.shop.rest.ZbAlipayAuthController;
 import co.zhenxi.modules.shop.service.ZbPrivilegesService;
 import co.zhenxi.modules.shop.service.dto.ZbPrivilegesDto;
 import co.zhenxi.modules.shop.service.dto.ZbPrivilegesQueryCriteria;
+import co.zhenxi.modules.shop.service.mapper.ZbPackageMapper;
 import co.zhenxi.modules.shop.service.mapper.ZbPrivilegesMapper;
+import co.zhenxi.modules.until.LineToHumpUtil;
 import co.zhenxi.utils.FileUtil;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
@@ -24,10 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // 默认不使用缓存
 //import org.springframework.cache.annotation.CacheConfig;
@@ -46,6 +50,8 @@ public class ZbPrivilegesServiceImpl extends BaseServiceImpl<ZbPrivilegesMapper,
 
     private final IGenerator generator;
     private final ZbPrivilegesMapper zbPrivilegesMapper;
+
+    private final ZbPackageMapper zbPackageMapper;
 
 
     @Override
@@ -109,5 +115,83 @@ public class ZbPrivilegesServiceImpl extends BaseServiceImpl<ZbPrivilegesMapper,
         }
 
         zbPrivilegesMapper.updateOnstatus(status,id);
+    }
+
+    /**
+     * 获取特权信息
+     *
+     * @return
+     */
+    @Override
+    public List<ZbPrivileges> getPrivileges() {
+        return zbPrivilegesMapper.getPrivileges();
+    }
+
+    /**
+     * 获取特权详情
+     *
+     * @return
+     */
+    @Override
+    public List<ZbPackAdvice> getVipInfo() {
+
+        return null;
+    }
+
+    /**
+     * 获取特权服务的ID集合
+     *
+     * @param packageId
+     * @return
+     */
+    @Override
+    public List<Integer> getPrivilegesIds(Integer packageId) {
+
+        return  zbPrivilegesMapper.getPrivilegesIds(packageId);
+    }
+
+    /**
+     * 获取特权详情2
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String,Object>> getVipInfoT() {
+
+
+        List<ZbPackage> vipInfoT = zbPackageMapper.getVipInfoT();
+        List<ZbPrivileges> privilegesT = zbPrivilegesMapper.getPrivilegesT();
+        ArrayList<Map<String,Object>> maps = new ArrayList<>();
+        for (ZbPackage zbPackage : vipInfoT) {
+            Map<String,Object> map = new LinkedHashMap<>(10);
+            map.put("packageId",zbPackage.getId());
+            map.put("packageTitle",zbPackage.getTitle());
+            map.put("packagePrice",zbPackage.getPrice());
+            for (ZbPrivileges zbPrivileges : privilegesT) {
+                String code = LineToHumpUtil.lineToHump(zbPrivileges.getCode());
+                System.out.println(code);
+                map.put(code+"Ico",zbPrivileges.getIco());
+                map.put(code+"Name",zbPrivileges.getTitle());
+                map.put(code+"Rule", zbPrivilegesMapper.getPrivilegesIdRule(zbPackage.getId(), zbPrivileges.getId()));
+
+            }
+            maps.add(map);
+        }
+
+        return maps;
+    }
+
+
+
+    /**
+     * 套餐详情
+     *
+     * @param packageId
+     * @return
+     */
+    @Override
+    public ZbPackAdvice getVipInfoDetails(Integer packageId) {
+
+        return zbPrivilegesMapper.getVipInfo(packageId);
     }
 }

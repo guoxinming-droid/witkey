@@ -139,6 +139,21 @@ public interface ZbShopService  extends BaseService<ZbShop>{
      */
     Map<String,Object> getEvaluateByShopId(String shopId, Pageable pageable);
 
+    /**
+     * 根据用户获取ID
+     * @param uid
+     * @return
+     */
+    ZbShop getshopByuid(Integer uid);
+
+    /**
+     * 收藏店铺
+     * @param uid
+     * @param shopId
+     * @return
+     */
+    void CollectionShop(Integer uid, Integer shopId);
+
 //    /**
 //     *
 //     * @param shopId

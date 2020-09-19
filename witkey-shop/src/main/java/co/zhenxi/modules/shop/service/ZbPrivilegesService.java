@@ -6,6 +6,7 @@
 */
 package co.zhenxi.modules.shop.service;
 import co.zhenxi.common.service.BaseService;
+import co.zhenxi.modules.shop.domain.ZbPackAdvice;
 import co.zhenxi.modules.shop.domain.ZbPrivileges;
 import co.zhenxi.modules.shop.service.dto.ZbPrivilegesDto;
 import co.zhenxi.modules.shop.service.dto.ZbPrivilegesQueryCriteria;
@@ -60,4 +61,36 @@ public interface ZbPrivilegesService  extends BaseService<ZbPrivileges>{
      * @param recommend
      */
     void onStatus(Integer id, int recommend);
+
+    /**
+     * 获取特权信息
+     * @return
+     */
+    List<ZbPrivileges> getPrivileges();
+
+    /**
+     * 获取特权详情
+     * @return
+     */
+    List<ZbPackAdvice> getVipInfo();
+
+    /**
+     * 获取特权服务的ID集合
+     * @param packageId
+     * @return
+     */
+    List<Integer> getPrivilegesIds(Integer packageId);
+
+    /**
+     * 获取特权详情2
+     * @return
+     */
+    List<Map<String,Object>> getVipInfoT();
+
+    /**
+     * 套餐详情
+     * @param packageId
+     * @return
+     */
+    ZbPackAdvice getVipInfoDetails(Integer packageId);
 }

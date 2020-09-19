@@ -8,6 +8,7 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbSuccessCase;
+import co.zhenxi.modules.shop.domain.ZbSuccessCaseAdcice;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
@@ -84,4 +85,13 @@ public interface ZbSuccessCaseMapper extends CoreMapper<ZbSuccessCase> {
             "\t) ssm\n" +
             "\tgroup by ssm.cate_id")
     List<Map<String ,Object>> getSuccessCaseCount(Integer id);
+
+    @Select("SELECT\n" +
+            "\t( SELECT NAME FROM zb_users WHERE id = uid ) name,\n" +
+            "\tzb_success_case.* \n" +
+            "FROM\n" +
+            "\tzb_success_case \n" +
+            "WHERE\n" +
+            "\tcate_id IN ( SELECT id FROM zb_cate WHERE pid = #{catePid} )")
+    Page<ZbSuccessCaseAdcice> getServiceProviderByCatePid(Integer catePid);
 }

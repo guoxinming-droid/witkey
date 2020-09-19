@@ -6,6 +6,7 @@
 */
 package co.zhenxi.modules.shop.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import com.baomidou.mybatisplus.annotation.TableName;
 import cn.hutool.core.bean.BeanUtil;
@@ -72,10 +73,12 @@ public class ZbInterview implements Serializable {
 
 
     /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Timestamp createdAt;
 
 
     /** 修改时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Timestamp updatedAt;
 
 

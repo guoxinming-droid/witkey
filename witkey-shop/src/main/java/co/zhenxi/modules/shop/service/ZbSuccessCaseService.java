@@ -73,4 +73,12 @@ public interface ZbSuccessCaseService  extends BaseService<ZbSuccessCase>{
      * @return
      */
     Map<String, Object> getSuccessStories(Pageable size);
+
+    /**
+     * 根据一级标签
+     * @param catePid
+     * @param pageable
+     * @return
+     */
+    Map<String, Object> getServiceProviderByCatePid(Integer catePid, Pageable pageable);
 }

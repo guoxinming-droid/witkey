@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -179,7 +180,11 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
         PageInfo<ZbTask> page = new PageInfo<>(queryAll(criteria));
         page.setSize(15);
         Map<String, Object> map = new LinkedHashMap<>(2);
-        map.put("content", generator.convert(page.getList(), ZbTaskDto.class));
+        List<ZbTask> list = page.getList();
+        for (ZbTask zbTask : list) {
+            zbTask.setBounty(zbTask.getBounty().setScale(2, RoundingMode.HALF_UP));
+        }
+        map.put("content", generator.convert(list, ZbTaskDto.class));
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -234,8 +239,11 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
      */
     @Override
     public List<ZbTask> getByCreateTime(Timestamp createTime) {
-
-        return zbTaskMapper.getByCreateTime(createTime);
+        List<ZbTask> list = zbTaskMapper.getByCreateTime(createTime);
+        for (ZbTask zbTask : list) {
+            zbTask.setBounty(zbTask.getBounty().setScale(2, RoundingMode.HALF_UP));
+        }
+        return list;
     }
 
     /**

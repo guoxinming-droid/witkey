@@ -6,6 +6,7 @@
 */
 package co.zhenxi.modules.shop.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.sql.Timestamp;
 import java.io.Serializable;
@@ -78,8 +79,10 @@ public class ZbArticleDto implements Serializable {
     private Integer isRecommended;
 
     /** 添加时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH-mm-ss")
     private Timestamp createdAt;
 
     /** 修改时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH-mm-ss")
     private Timestamp updatedAt;
 }

@@ -216,7 +216,7 @@ public interface ZbGoodsMapper extends CoreMapper<ZbGoods> {
             "select \n" +
             "id ," +
             "title ," +
-            "( SELECT NAME FROM zb_cate, zb_goods WHERE zb_cate.id = zb_goods.cate_pid and zb_goods.id=#{goodsId} ) AS tagPame," +
+            "( SELECT z2.NAME FROM zb_cate z1,zb_cate z2, zb_goods WHERE z1.id = zb_goods.cate_id and z2.id=z1.pid and  zb_goods.id=#{goodsId} ) AS tagPame," +
             "( SELECT NAME FROM zb_cate, zb_goods WHERE zb_cate.id = zb_goods.cate_id and zb_goods.id=#{goodsId}) AS tagName," +
             "cash\n" +
             "from\n" +
@@ -226,5 +226,5 @@ public interface ZbGoodsMapper extends CoreMapper<ZbGoods> {
             "AND \n" +
             "is_delete = 0 \n" +
             "AND id = #{goodsId}")
-    Map<String ,Object> selectGoodsById(Integer goodsId);
+    ZbGoodsAdvice selectGoodsById(Integer goodsId);
 }

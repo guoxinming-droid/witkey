@@ -51,4 +51,11 @@ public interface ZbPackageService  extends BaseService<ZbPackage>{
      * @param status
      */
     void onStatus(Integer id, int status);
+
+    /**
+     * 查询全部不分页
+     * @return
+     */
+    List<ZbPackage> getPackage();
+
 }

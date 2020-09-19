@@ -43,4 +43,17 @@ public interface ZbInterviewService  extends BaseService<ZbInterview>{
     * @throws IOException /
     */
     void download(List<ZbInterviewDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 获取VIP访谈
+     * @return
+     */
+    List<ZbInterview> getInterview();
+
+    /**
+     * 获取vip访谈表
+     * @param pageable
+     */
+    Map<String, Object> getInterviewByVip(Pageable pageable);
+
 }

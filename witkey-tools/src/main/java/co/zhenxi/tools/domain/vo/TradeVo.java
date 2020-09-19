@@ -5,6 +5,8 @@
  */
 package co.zhenxi.tools.domain.vo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -19,6 +21,11 @@ import java.sql.Timestamp;
  */
 @Data
 public class TradeVo {
+
+
+    /**主键*/
+    @TableId
+    private long id;
 
     /** （必填）商品描述 */
     @NotBlank

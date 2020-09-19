@@ -6,8 +6,11 @@
 */
 package co.zhenxi.modules.shop.service.impl;
 
+import co.zhenxi.modules.shop.domain.Trade;
 import co.zhenxi.modules.shop.domain.ZbVipshopOrder;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
+import co.zhenxi.modules.shop.service.TradeService;
+import co.zhenxi.modules.shop.service.ZbShopPackageService;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
 import com.github.pagehelper.PageHelper;
@@ -28,12 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 /**
 * @author guoke
@@ -46,6 +47,11 @@ import java.util.LinkedHashMap;
 public class ZbVipshopOrderServiceImpl extends BaseServiceImpl<ZbVipshopOrderMapper, ZbVipshopOrder> implements ZbVipshopOrderService {
 
     private final IGenerator generator;
+
+    private final ZbVipshopOrderMapper zbVipshopOrderMapper;
+
+    private final TradeService tradeService;
+    private final ZbShopPackageService zbShopPackageService;
 
     @Override
     //@Cacheable
@@ -84,5 +90,57 @@ public class ZbVipshopOrderServiceImpl extends BaseServiceImpl<ZbVipshopOrderMap
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    /**
+     * 看此用户是否支付成功
+     *
+     * @param uid
+     * @return
+     */
+    @Override
+    public ZbVipshopOrder getByUId(Integer uid) {
+
+        return  zbVipshopOrderMapper.getByUid(uid);
+    }
+
+    @Override
+    public ZbVipshopOrder getByCode(String code) {
+
+        return  zbVipshopOrderMapper.getByCode(code);
+    }
+
+    /**
+     * 生成订单
+     *
+     * @param zbVipshopOrder
+     * @return 订单号
+     */
+    @Override
+    public String generateOrder(ZbVipshopOrder zbVipshopOrder) {
+        zbVipshopOrderMapper.insert(zbVipshopOrder);
+        ZbVipshopOrder zbVipshopOrder1 = zbVipshopOrderMapper.selectById(zbVipshopOrder.getId());
+        return zbVipshopOrder1.getCode();
+    }
+
+    /**
+     * 修改订单状态
+     *
+     * @param tradeNo
+     * @return
+     */
+    @Override
+    public HashMap<String, String> updateByCode(String tradeNo) throws Exception {
+        Trade trade = tradeService.getByTradeNo(tradeNo);
+        HashMap<String, String> stringStringHashMap = new HashMap<>(1);
+        if(trade!=null && "1".equals(trade.getStatus())){
+            zbVipshopOrderMapper.updateByTradeNo(tradeNo);
+            ZbVipshopOrder byCode = zbVipshopOrderMapper.getByCode(tradeNo);
+            zbShopPackageService.insert(byCode.getPackageId(),byCode.getUid(),byCode.getTimePeriod());
+           stringStringHashMap.put("message","开通成功");
+            return stringStringHashMap;
+        }
+        stringStringHashMap.put("message","开通失败，请检查订单状态");
+        return stringStringHashMap;
     }
 }

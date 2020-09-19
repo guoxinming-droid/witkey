@@ -41,6 +41,9 @@ public class ZbPackageDto implements Serializable {
     /** 套餐状态 */
     private Integer typeStatus;
 
+    /** 套餐价格*/
+    private double price;
+
     /** 创建时间 */
     private Timestamp createdAt;
 

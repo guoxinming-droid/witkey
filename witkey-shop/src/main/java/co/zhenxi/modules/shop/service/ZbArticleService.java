@@ -66,4 +66,13 @@ public interface ZbArticleService  extends BaseService<ZbArticle>{
      * 获取资讯文章
      */
     Map<String, Object> getArticle(Pageable size);
+
+    /**
+     * 获取资讯标题
+     * @param articleId
+     * @return
+     */
+    Map<String,Object> getArticleTitle(Integer articleId);
+
+    Map<String,Object> getRelevantArticleTitle(Integer articleId);
 }

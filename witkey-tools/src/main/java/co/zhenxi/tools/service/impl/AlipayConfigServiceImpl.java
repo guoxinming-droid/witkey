@@ -11,11 +11,16 @@ import co.zhenxi.tools.domain.AlipayConfig;
 import co.zhenxi.tools.domain.vo.TradeVo;
 import co.zhenxi.tools.service.AlipayConfigService;
 import co.zhenxi.tools.service.mapper.AlipayConfigMapper;
+import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +39,12 @@ import org.springframework.transaction.annotation.Transactional;
 //@CacheConfig(cacheNames = "alipayConfig")
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class AlipayConfigServiceImpl extends BaseServiceImpl<AlipayConfigMapper, AlipayConfig> implements AlipayConfigService {
+
+
+    private AlipayConfigMapper alipayConfigMapper;
+
     @Override
     public String toPayAsPc(AlipayConfig alipay, TradeVo trade) throws Exception {
-
         if(alipay.getId() == null){
             throw new BadRequestException("请先添加相应配置，再操作");
         }
@@ -105,5 +113,78 @@ public class AlipayConfigServiceImpl extends BaseServiceImpl<AlipayConfigMapper,
     @Transactional(rollbackFor = Exception.class)
     public void update(AlipayConfig alipayConfig) {
          this.save(alipayConfig);
+    }
+
+    /**
+     * 向支付宝发起订单查询请求
+     *
+     * @param outTradeNo
+     * @return String
+     */
+    @Override
+    public String checkAlipay(String outTradeNo) {
+        //ServiceImpl.log.info("==================向支付宝发起查询，查询商户订单号为：" + outTradeNo);
+
+
+        try {
+            //实例化客户端（参数：网关地址、商户appid、商户私钥、格式、编码、支付宝公钥、加密类型）
+
+            AlipayConfig alipayConfig =find();
+            AlipayClient alipayClient = new DefaultAlipayClient(alipayConfig.getGatewayUrl(), alipayConfig.getAppId(),
+                    alipayConfig.getPrivateKey(), alipayConfig.getFormat(), alipayConfig.getCharset(),
+                    alipayConfig.getPublicKey(), alipayConfig.getSignType());
+            AlipayTradeQueryRequest alipayTradeQueryRequest = new AlipayTradeQueryRequest();
+            alipayTradeQueryRequest.setBizContent("{" +
+                    "\"out_trade_no\":\"" + outTradeNo + "\"" +
+                    "}");
+            AlipayTradeQueryResponse alipayTradeQueryResponse = alipayClient.execute(alipayTradeQueryRequest);
+            if (alipayTradeQueryResponse.isSuccess()) {
+                String str = "";
+                //修改数据库支付宝订单表
+
+                // 判断交易结果
+                switch (alipayTradeQueryResponse.getTradeStatus())
+                {
+                    // 交易结束并不可退款
+                    case "TRADE_FINISHED":
+                        str = "交易结束并不可退款:TRADE_FINISHED";
+                        break;
+                    // 交易支付成功
+                    case "TRADE_SUCCESS":
+                        str = "交易支付成功:TRADE_SUCCESS";
+                        break;
+                    // 未付款交易超时关闭或支付完成后全额退款
+                    case "TRADE_CLOSED":
+                        str = "未付款交易超时关闭或支付完成后全额退款:TRADE_CLOSED";
+                        break;
+                    // 交易创建并等待买家付款
+                    case "WAIT_BUYER_PAY":
+                        str = "交易创建并等待买家付款:WAIT_BUYER_PAY";
+                        break;
+                    default:
+                        break;
+                }
+                //更新表记录
+                return str;
+            } else {
+                //log.info("==================调用支付宝查询接口失败！");
+            }
+        } catch (AlipayApiException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "fail";
+
+    }
+
+    /**
+     * 修改订单状态
+     *
+     * @param outTradeNo@return
+     *
+     */
+    @Override
+    public void updateOutTradeNo(String outTradeNo) {
+        alipayConfigMapper.updateOutTradeNo(outTradeNo);
     }
 }

@@ -8,6 +8,7 @@ package co.zhenxi.modules.shop.service.impl;
 
 import co.zhenxi.modules.shop.domain.ZbInterview;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
+import com.github.pagehelper.Page;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
 import com.github.pagehelper.PageHelper;
@@ -26,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.cache.annotation.CacheConfig;
 //import org.springframework.cache.annotation.CacheEvict;
 //import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +46,7 @@ import java.util.LinkedHashMap;
 public class ZbInterviewServiceImpl extends BaseServiceImpl<ZbInterviewMapper, ZbInterview> implements ZbInterviewService {
 
     private final IGenerator generator;
+    private final ZbInterviewMapper zbInterviewMapper;
 
     @Override
     //@Cacheable
@@ -85,5 +86,30 @@ public class ZbInterviewServiceImpl extends BaseServiceImpl<ZbInterviewMapper, Z
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    /**
+     * 获取VIP访谈
+     *
+     * @return
+     */
+    @Override
+    public List<ZbInterview> getInterview() {
+        return zbInterviewMapper.getInterview();
+    }
+
+    /**
+     * 获取vip访谈表
+     *
+     * @param pageable
+     */
+    @Override
+    public Map<String, Object> getInterviewByVip(Pageable pageable) {
+        getPage(pageable);
+        Page<ZbInterview> page =  zbInterviewMapper.getInterviewByVip();
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(page.getResult(), ZbInterviewDto.class));
+        map.put("totalElements", page.getTotal());
+        return map;
     }
 }

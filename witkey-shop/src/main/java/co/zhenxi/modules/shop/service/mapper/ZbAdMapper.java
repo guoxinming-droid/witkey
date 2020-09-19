@@ -14,6 +14,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
+
 /**
 * @author Guoxm
 * @date 2020-07-16
@@ -24,4 +26,7 @@ public interface ZbAdMapper extends CoreMapper<ZbAd> {
 
     @Select("select * from zb_ad where target_id = #{targetId}")
     Page<ZbAd> queryAd(@Param("targetId") Integer targetId);
+
+    @Select("select ad_num from zb_ad_target where target_id = #{targetId}")
+    Integer queryAdNum(@Param("targetId") Integer targetId);
 }

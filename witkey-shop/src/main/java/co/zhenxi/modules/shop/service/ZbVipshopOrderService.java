@@ -10,6 +10,8 @@ import co.zhenxi.modules.shop.domain.ZbVipshopOrder;
 import co.zhenxi.modules.shop.service.dto.ZbVipshopOrderDto;
 import co.zhenxi.modules.shop.service.dto.ZbVipshopOrderQueryCriteria;
 import org.springframework.data.domain.Pageable;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
@@ -43,4 +45,35 @@ public interface ZbVipshopOrderService  extends BaseService<ZbVipshopOrder>{
     * @throws IOException /
     */
     void download(List<ZbVipshopOrderDto> all, HttpServletResponse response) throws IOException;
+
+    /**
+     * 看此用户是否支付成功
+     * @param uid
+     * @return
+     */
+    ZbVipshopOrder getByUId(Integer uid);
+
+    /**
+     *
+     * 看此用户是否支付成功
+     * @param code
+     */
+    ZbVipshopOrder getByCode(String code);
+
+
+
+    /**
+     *
+     * 生成订单
+     * @param zbVipshopOrder
+     * @return 订单号
+     */
+    String  generateOrder(ZbVipshopOrder zbVipshopOrder);
+
+    /**
+     * 修改订单状态
+     * @param tradeNo
+     * @return
+     */
+    HashMap<String, String> updateByCode(String tradeNo) throws Exception;
 }

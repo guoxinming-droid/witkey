@@ -44,4 +44,23 @@ public interface AlipayConfigService  extends BaseService<AlipayConfig> {
      * @return AlipayConfig
      */
     void update(AlipayConfig alipayConfig);
+
+    /**
+     * 向支付宝发起订单查询请求
+     *
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    String checkAlipay(String outTradeNo);
+
+
+    /**
+     * 向支付宝发起订单查询请求
+     *
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    void updateOutTradeNo(String outTradeNo);
 }

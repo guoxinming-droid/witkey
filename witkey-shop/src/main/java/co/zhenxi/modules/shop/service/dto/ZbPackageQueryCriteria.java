@@ -16,4 +16,7 @@ import co.zhenxi.annotation.Query;
 */
 @Data
 public class ZbPackageQueryCriteria{
+
+    @Query
+    private Integer status;
 }

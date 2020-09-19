@@ -143,4 +143,14 @@ public class ZbArticleServiceImpl extends BaseServiceImpl<ZbArticleMapper, ZbArt
         map.put("totalElements", page.getTotal());
         return map;
     }
+
+    @Override
+    public Map<String, Object> getArticleTitle(Integer articleId) {
+        return zbArticleMapper.getArticleTitle(articleId);
+    }
+
+    @Override
+    public Map<String, Object> getRelevantArticleTitle(Integer articleId) {
+        return zbArticleMapper.getArticleTitleByCatId(articleId);
+    }
 }

@@ -101,7 +101,7 @@ public class TaskPageController {
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
     @PostMapping("/getTaskToEcho")
-    public ZbTask getTaskToEcho(@RequestBody ZbTask zbTask){
+    public ZbTask getTaskToEcho(@RequestBody ZbTask zbTask,Integer uid){
         if(zbTask!=null){
             return zbTask;
         }

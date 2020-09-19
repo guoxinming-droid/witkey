@@ -82,4 +82,11 @@ public interface ZbUsersService  extends BaseService<ZbUsers>{
      * @param password 更改的密码
      */
     void updatePassword(Integer id, String password);
+
+    /**
+     * 登录
+     * @param zbUsers
+     */
+    ZbUsers login(ZbUsers zbUsers);
+
 }

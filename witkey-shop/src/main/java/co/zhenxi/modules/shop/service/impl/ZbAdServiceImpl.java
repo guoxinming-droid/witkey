@@ -100,6 +100,9 @@ public class ZbAdServiceImpl extends BaseServiceImpl<ZbAdMapper, ZbAd> implement
      */
     @Override
     public List queryAd(Integer targetId, Integer pageSize) {
+        if(pageSize==null){
+            pageSize = zbAdMapper.queryAdNum(targetId);
+        }
         PageHelper.startPage(0,pageSize);
         Page<ZbAd> zbAds = zbAdMapper.queryAd(targetId);
         return zbAds.getResult();

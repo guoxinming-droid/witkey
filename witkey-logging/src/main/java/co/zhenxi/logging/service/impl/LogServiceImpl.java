@@ -135,7 +135,11 @@ public class LogServiceImpl extends BaseServiceImpl<LogMapper, Log>  implements 
         if(loginPath.equals(signature.getName())){
             try {
                 assert argValues != null;
-                username = new JSONObject(argValues[0]).get("username").toString();
+                try {
+                    username = new JSONObject(argValues[0]).get("username").toString();
+                }catch (NullPointerException e){
+                    username = new JSONObject(argValues[0]).get("name").toString();
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }

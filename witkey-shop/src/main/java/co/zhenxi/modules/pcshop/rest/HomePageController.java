@@ -68,7 +68,7 @@ public class HomePageController {
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
     @GetMapping("/getAd")
-    public ResponseEntity<Object> qureyAd(@RequestParam("targetId") Integer targetId, @RequestParam("pageSize")Integer pageSize) {
+    public ResponseEntity<Object> qureyAd(@RequestParam("targetId") Integer targetId, Integer pageSize) {
         return new ResponseEntity<>(zbAdService.queryAd(targetId,pageSize), HttpStatus.OK);
     }
 

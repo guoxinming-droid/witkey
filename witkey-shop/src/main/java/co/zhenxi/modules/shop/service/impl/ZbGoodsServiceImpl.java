@@ -9,10 +9,7 @@ package co.zhenxi.modules.shop.service.impl;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
-import co.zhenxi.modules.shop.domain.ZbGoods;
-import co.zhenxi.modules.shop.domain.ZbGoodsAdvice;
-import co.zhenxi.modules.shop.domain.ZbGoodsComment;
-import co.zhenxi.modules.shop.domain.ZbShop;
+import co.zhenxi.modules.shop.domain.*;
 import co.zhenxi.modules.shop.service.ZbGoodsCommentService;
 import co.zhenxi.modules.shop.service.ZbGoodsService;
 import co.zhenxi.modules.shop.service.ZbShopService;
@@ -36,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 // 默认不使用缓存
@@ -211,8 +209,12 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
             sql = "and type = "+ type;
         }
         Page<ZbGoods> page = zbGoodsMapper.getGoods(sql);
+        List<ZbGoods> list = page.getResult();
+        for (ZbGoods zbGoods : list) {
+            zbGoods.setCash(zbGoods.getCash().setScale(2, RoundingMode.HALF_UP));
+        }
         Map<String, Object> map = new LinkedHashMap<>(2);
-        map.put("content", generator.convert(page.getResult(), ZbGoods.class));
+        map.put("content", generator.convert(list, ZbGoods.class));
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -317,10 +319,38 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
      * @return
      */
     @Override
-    public Map<String ,Object>  GoodsPutOrder(Integer goodsIds, Pageable pageable) {
-        Map<String, Object> stringObjectMap = zbGoodsMapper.selectGoodsById(goodsIds);
-        stringObjectMap.put("count",1);
-        return  stringObjectMap;
+    public List<Map<String, Object>>  GoodsPutOrder(Integer[] goodsIds, Pageable pageable) {
+        HashMap<Object, Object> map = new HashMap<>(2);
+        ArrayList<ZbGoodsAdvice> zbGoodsAdvices = new ArrayList<>();
+        for (int i = 0; i < goodsIds.length; i++) {
+            zbGoodsAdvices.add(zbGoodsMapper.selectGoodsById(goodsIds[i]));
+        }
+        for (ZbGoodsAdvice zbGoodsAdvice : zbGoodsAdvices) {
+            if(null==map.get(zbGoodsAdvice)){
+                map.put(zbGoodsAdvice,1);
+            }else {
+                int count = (int)map.get(zbGoodsAdvice)+1;
+                map.put(zbGoodsAdvice,count);
+            }
+        }
+        ArrayList<Map<String, Object>> maps = new ArrayList<>();
+
+        Set<Object> keys = map.keySet();
+
+        for (Object key : keys) {
+            System.out.println(key.toString());
+            HashMap<String, Object> map1 = new HashMap<>(3);
+            ZbGoodsAdvice zbGoodsAdvice = (ZbGoodsAdvice) key;
+            BigDecimal bigDecimal = new BigDecimal(0.0);
+            map1.put("zbGoods",key);
+            map1.put("count",map.get(key));
+            map1.put("price",bigDecimal.add(zbGoodsAdvice.getCash()).multiply(new BigDecimal((int)map.get(key))));
+            maps.add(map1);
+        }
+
+        //Map<String, Object> stringObjectMap = zbGoodsMapper.selectGoodsById(goodsIds);
+
+        return  maps;
     }
 
 
