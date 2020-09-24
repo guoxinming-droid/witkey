@@ -95,6 +95,8 @@ public class ZbLinkServiceImpl extends BaseServiceImpl<ZbLinkMapper, ZbLink> imp
         Page<ZbLink> page = zbLinkMapper.getLink();
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getResult(), ZbLink.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }

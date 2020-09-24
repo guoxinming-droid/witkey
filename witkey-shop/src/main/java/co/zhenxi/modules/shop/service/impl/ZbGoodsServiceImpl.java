@@ -215,6 +215,8 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
         }
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(list, ZbGoods.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }

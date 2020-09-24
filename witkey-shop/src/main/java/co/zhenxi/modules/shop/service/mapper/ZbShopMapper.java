@@ -121,7 +121,7 @@ public interface ZbShopMapper extends CoreMapper<ZbShop> {
 
 
     @Select("select *,(select count(1) from zb_employ,zb_shop where zb_employ.employee_uid = zb_shop.uid) as serviceCount from zb_shop where id =#{id}")
-    ZbShop getShopByid1(Integer shopId);
+    ZbShopAdvice getShopByid1(Integer shopId);
 
     @Select("SELECT\n" +
             "\tzb_district.NAME AS cityNmae \n" +
@@ -140,4 +140,6 @@ public interface ZbShopMapper extends CoreMapper<ZbShop> {
 
     @Insert("insert into zb_shop_focus values(null, #{uid},#{shopId},NOW())")
     void CollectionShop(Integer uid, Integer shopId);
+
+    void getServiceProviderByShopId(Integer id, Integer uid);
 }

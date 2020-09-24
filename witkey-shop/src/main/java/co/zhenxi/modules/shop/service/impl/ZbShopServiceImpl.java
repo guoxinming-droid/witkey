@@ -14,7 +14,9 @@ import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbShopDto;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.*;
+import co.zhenxi.tools.utils.StringUtil;
 import co.zhenxi.utils.FileUtil;
+import co.zhenxi.utils.StringUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
@@ -65,6 +67,26 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
         map.put("content", generator.convert(page.getList(), ZbShopDto.class));
         map.put("totalElements", page.getTotal());
         return map;
+    }
+
+    /**
+     * 查询数据分页
+     *
+     * @param criteria 条件
+     * @param Uname
+     * @param pageable 分页参数
+     * @return Map<String, Object>
+     */
+    @Override
+    public Map<String, Object> queryAll(ZbShopQueryCriteria criteria, String Uname, Pageable pageable) {
+        if(StringUtils.isEmpty(Uname)){
+            getPage(pageable);
+            PageInfo<ZbShop> page = new PageInfo<>(queryAll(criteria));
+            for (ZbShop zbShop : page.getList()) {
+                zbShopMapper.getServiceProviderByShopId(zbShop.getId(),zbShop.getUid());
+            }
+        }
+        return null;
     }
 
 
@@ -157,6 +179,8 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
         Page<Map<String , Object>> page = zbShopMapper.getShopByVip();
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", page.getResult());
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -176,6 +200,8 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
         System.out.println(zbShopAdvice.getPName()+": "+zbShopAdvice.getSName());
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(result,ZbShopAdvice.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -190,62 +216,62 @@ public class ZbShopServiceImpl extends BaseServiceImpl<ZbShopMapper, ZbShop> imp
     public ZbShop queryAllById(Integer shopId) {
 
 
-        ZbShop zbShop = zbShopMapper.getShopByid1(shopId);
-
-
-        Map<String, Object> maps = new HashMap<>();
-
+        ZbShopAdvice zbShop = zbShopMapper.getShopByid1(shopId);
         @NotNull Integer uid = zbShop.getUid();
+        zbShop.setAuthenticationMap(getAuthentication(uid));
+        return zbShop;
+    }
+    protected  Map<String, Object> getAuthentication(Integer uid){
+        Map<String, Object> maps = new HashMap<>();
         //获取认证状态
         //1：邮箱认证
         ZbUsers users = zbUsersService.getById(uid);
         if(users!=null) {
             @NotNull Integer emailStatus = users.getEmailStatus();
             if (emailStatus == 2) {
-                maps.put("邮箱认证", true);
+                maps.put("emailAuthentication", true);
             }
         }
-        maps.put("邮箱认证",false);
+        maps.put("emailAuthentication",false);
         //实名认证
         ZbRealnameAuth zbRealnameAuthP =  zbRealnameAuthService.getByUid(uid,1);
         if(zbRealnameAuthP!=null) {
             @NotNull Integer realNameStatusP = zbRealnameAuthP.getStatus();
             if (realNameStatusP == 1) {
-                maps.put("实名认证", true);
+                maps.put("realNameAuthentication", true);
             }
         }
-            maps.put("实名认证", false);
+        maps.put("realNameAuthentication", false);
 
         //企业认证
-        ZbRealnameAuth zbRealnameAuthC =  zbRealnameAuthService.getByUid(uid,1);
+        ZbRealnameAuth zbRealnameAuthC =  zbRealnameAuthService.getByUid(uid,2);
         if(zbRealnameAuthC!=null) {
             @NotNull Integer realNameStatusC = zbRealnameAuthC.getStatus();
             if (realNameStatusC == 1) {
-                maps.put("企业认证", true);
+                maps.put("enterpriseAuthentication", true);
             }
         }
-        maps.put("企业认证",false);
+        maps.put("enterpriseAuthentication",false);
 
         //支付宝认证
         ZbAlipayAuth zbAlipayAuth = zbAlipayAuthService.getByUid(uid);
         if(zbAlipayAuth!=null) {
             Integer aliStatus = zbAlipayAuth.getStatus();
             if (aliStatus == 2) {
-                maps.put("支付宝认证", true);
+                maps.put("aLiAuthentication", true);
             }
         }
-        maps.put("支付宝认证",false);
+        maps.put("aLiAuthentication",false);
         //银行认证
         ZbBankAuth zbBankAuth = zbBankAuthService.getByUid(uid);
-        if(zbAlipayAuth!=null) {
+        if(zbBankAuth!=null) {
             Integer bankStatus = zbBankAuth.getStatus();
             if (bankStatus == 2) {
-                maps.put("银行认证", true);
+                maps.put("bankAuthentication", true);
             }
         }
-        maps.put("银行认证",false);
-        zbShop.setAuthenticationMap(maps);
-        return zbShop;
+        maps.put("bankAuthentication",false);
+        return maps;
     }
 
     /**

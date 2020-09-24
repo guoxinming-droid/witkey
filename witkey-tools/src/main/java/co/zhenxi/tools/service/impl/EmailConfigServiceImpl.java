@@ -55,7 +55,7 @@ public class EmailConfigServiceImpl extends BaseServiceImpl<EmailConfigMapper, E
     @Override
 //    @Cacheable(key = "'1'")
     public EmailConfig find() {
-        EmailConfig emailConfig = this.list().get(0);
+        EmailConfig emailConfig = this.list().get(1);
         return emailConfig;
     }
 

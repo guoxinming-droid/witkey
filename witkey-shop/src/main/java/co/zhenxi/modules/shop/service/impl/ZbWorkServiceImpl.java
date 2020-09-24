@@ -18,6 +18,7 @@ import co.zhenxi.modules.shop.service.dto.ZbWorkDto;
 import co.zhenxi.modules.shop.service.dto.ZbWorkQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbTaskMapper;
 import co.zhenxi.modules.shop.service.mapper.ZbWorkMapper;
+import co.zhenxi.tools.service.dto.LocalStorageDto;
 import co.zhenxi.utils.FileUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
@@ -61,6 +62,8 @@ public class ZbWorkServiceImpl extends BaseServiceImpl<ZbWorkMapper, ZbWork> imp
         PageInfo<ZbWork> page = new PageInfo<>(queryAll(criteria));
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getList(), ZbWorkDto.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -93,7 +96,7 @@ public class ZbWorkServiceImpl extends BaseServiceImpl<ZbWorkMapper, ZbWork> imp
     }
 
     @Override
-    public List<ZbWork> getWorkByTaskId(long taskId) {
+    public List<Map<String,Object>> getWorkByTaskId(long taskId) {
 
         return zbWorkMapper.getWorkByTaskId(taskId);
     }
@@ -119,30 +122,73 @@ public class ZbWorkServiceImpl extends BaseServiceImpl<ZbWorkMapper, ZbWork> imp
         }
         HashMap<String, Object> map = new HashMap<>();
         map.put("content", generator.convert(list, ZbWork.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
+
 
         return map;
     }
 
     /**
      * cha ru shu jv
-     *
-     * @param zbWork
+     *  @param zbWork
+     * @param attachmentIds
      */
     @Override
-    public Map insert(ZbWork zbWork) {
+    @Transactional(rollbackFor = Exception.class)
+    public Map insert(ZbWork zbWork, List<LocalStorageDto> attachmentIds) {
         zbWork.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         HashMap<String, Object> map = new HashMap<>(2);
         ZbUsers vip = zbUsersService.isVIP(zbWork.getUid());
+        //不是vip不让投稿一定金额的任务
         if(vip.getIsvip()!=1){
             map.put("flag",false);
             map.put("message","您无法投搞此金额的任务，可以购买vip增加可投稿金额");
             return map;
         }
+        //判断是否投过了  不允许重复投递同一任务
+        Integer workId = zbWorkMapper.getWorkByUidAndTaskId(zbWork.getUid(),zbWork.getTaskId());
+        if(workId == null || workId <=0){
+            map.put("flag",false);
+            map.put("message","您已经投过稿了，换个任务试一下吧");
+            return map;
+        }
         zbWorkMapper.insera(zbWork);
+        //投稿记录与附件
+        for (LocalStorageDto localStorageDto : attachmentIds) {
+            zbWorkMapper.insertWorkAttachment(zbWork.getTaskId(),zbWork.getId(),localStorageDto.getId(),localStorageDto.getSuffix(),new Timestamp(System.currentTimeMillis()));
+        }
         zbTaskMapper.updateDeliveryCount(zbWork.getTaskId(),new Timestamp(System.currentTimeMillis()));
         map.put("flag",true);
         map.put("message","投稿成功");
         return map;
+    }
+
+    @Override
+    public List<ZbWork> getWorkByTaskId1(Integer id) {
+
+        return zbWorkMapper.getWorkByTaskId1(id);
+    }
+
+    /**
+     * 获取投稿附件Id 类型
+     *
+     * @param workId
+     * @param id
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getWorkAttachment(Integer workId, long id) {
+
+        return zbWorkMapper.getWorkAttachment(workId,id);
+    }
+
+    @Override
+    public Map<String, Object> tenderWork(Integer taskId) {
+        ZbTask zbTask = zbTaskMapper.selectById(taskId);
+        LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>(1);
+        linkedHashMap.put("title",zbTask.getTitle());
+        return linkedHashMap;
     }
 }

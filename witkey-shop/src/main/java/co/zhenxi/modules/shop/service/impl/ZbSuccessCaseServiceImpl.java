@@ -59,6 +59,10 @@ public class ZbSuccessCaseServiceImpl extends BaseServiceImpl<ZbSuccessCaseMappe
         PageInfo<ZbSuccessCase> page = new PageInfo<>(queryAll(criteria));
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getList(), ZbSuccessCaseDto.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
+        System.out.println(page.getPageNum());
+        System.out.println(page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -148,6 +152,8 @@ public class ZbSuccessCaseServiceImpl extends BaseServiceImpl<ZbSuccessCaseMappe
             zbSuccessCase.setCash(bigDecimal);
         }
         map.put("content", generator.convert(result, ZbSuccessCase.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -165,6 +171,8 @@ public class ZbSuccessCaseServiceImpl extends BaseServiceImpl<ZbSuccessCaseMappe
         Page<ZbSuccessCaseAdcice> page = zbSuccessCaseMapper.getServiceProviderByCatePid(catePid);
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getResult(), ZbSuccessCaseAdcice.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
 

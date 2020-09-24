@@ -24,6 +24,8 @@ import java.util.Map;
 @TableName("zb_shop")
 public class ZbShop implements Serializable {
 
+
+
     /** 编号 */
     @TableId
     private Integer id;
@@ -151,9 +153,7 @@ public class ZbShop implements Serializable {
     private String tagPname;
 
 
-    private Map<String ,Object> authenticationMap;
 
-    private Integer serviceCount;
 
 
     public void copy(ZbShop source){

@@ -52,6 +52,8 @@ public class ZbDistrictServiceIml extends BaseServiceImpl<ZbDistrictMapper, ZbDi
         Page<ZbDistrict> page = zbDistrictMapper.getAllByPid(pid);
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getResult(), ZbDistrict.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }

@@ -26,6 +26,9 @@ public interface ZbCateMapper extends CoreMapper<ZbCate> {
     @Select("select * zb_cate where = #{fid}")
     List<ZbCate> getByFid(long fid);
 
+    @Select("select id from zb_cate  where pid = 0")
+    List<Integer> getByFida();
+
     @Select("SELECT a.id, a.created_at, a.path, a.name pname, b.name, a.sort, a.pic, a.choose_num, a.updated_at FROM zb_cate AS a  LEFT JOIN zb_cate b ON a.id = b.pid  where   a.pid = 0 order \n" +
             "by id DESC")
     List<ZbCate> queryAll(ZbCateQueryCriteria criteria);
@@ -59,5 +62,8 @@ public interface ZbCateMapper extends CoreMapper<ZbCate> {
     List<ZbCateAdvice> getAll();
     @Select("select * from zb_cate where pid = #{id} ORDER BY sort")
     List<ZbCateAdvice> getAllById(Integer id);
+
+    @Select("select id from zb_cate where pid = #{id} ORDER BY sort")
+    List<Integer> getAllBypId(Integer id);
 
 }

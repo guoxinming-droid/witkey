@@ -66,7 +66,12 @@ public interface ZbTaskService  extends BaseService<ZbTask>{
     void download(List<ZbTaskDto> all, HttpServletResponse response) throws IOException;
 
 
-    ZbTask getTasksById(long id);
+    /**
+     * 任务详情
+     * @param id
+     * @return
+     */
+    ZbTaskAdvice getTasksById(long id);
 
     ZbTask getTasksWorkById(long id);
 
@@ -135,4 +140,8 @@ public interface ZbTaskService  extends BaseService<ZbTask>{
      * @param uId 用户id
      */
     void collectionTask(Integer taskId, Integer uId);
+
+    List<ZbTask> getTasksWorkByIdPC(long taskId);
+
+    Map<String,Object> queryAll1(ZbTaskQueryCriteria zbTaskQueryCriteria, Pageable pageable);
 }

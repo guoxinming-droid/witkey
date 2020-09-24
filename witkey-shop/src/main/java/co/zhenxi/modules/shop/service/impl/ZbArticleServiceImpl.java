@@ -140,6 +140,8 @@ public class ZbArticleServiceImpl extends BaseServiceImpl<ZbArticleMapper, ZbArt
         Page<ZbArticle> page = zbArticleMapper.getArticle();
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getResult(), ZbArticle.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }

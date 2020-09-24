@@ -7,6 +7,7 @@ import co.zhenxi.modules.shop.domain.ZbTaskAdvice;
 import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
 import co.zhenxi.modules.shop.service.dto.ZbTaskQueryCriteria;
+import co.zhenxi.modules.shop.service.dto.ZbUserDetailQueryCriteria;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,7 @@ public class HomePageController {
 
     private final ZbGoodsService zbGoodsService;
 
-    //private final ZbRecommendService zbRecommendService;
+    private final ZbUserDetailService zbUserDetailService;
 
     private final ZbSuccessCaseService zbSuccessCaseService;
 
@@ -95,8 +96,8 @@ public class HomePageController {
     @ApiOperation("查询所有服务商")
     //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
     @AnonymousAccess
-    public ResponseEntity<Object> getShops(ZbShopQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(zbShopService.queryAll(criteria,pageable),HttpStatus.OK);
+    public ResponseEntity<Object> getShops(ZbUserDetailQueryCriteria criteria, Pageable pageable){
+        return new ResponseEntity<>(zbUserDetailService.queryAllByCateId(criteria,null,pageable),HttpStatus.OK);
     }
 
     @GetMapping(value = "/TaskListByCreateTime")
@@ -205,7 +206,7 @@ public class HomePageController {
     //@PreAuthorize("@el.check('admin','zbActivity:del')")
     @AnonymousAccess
     @GetMapping("/getShopByVip")
-    public Map<String,Object> getVipShop( @PageableDefault(sort = "zbvo.package_id") Pageable size){
+    public Map<String,Object> getVipShop( @PageableDefault(sort = "zb_shop_package.package_id") Pageable size){
         /**
          * 获取VIP店铺
          */

@@ -53,6 +53,9 @@ public interface ZbCateService  extends BaseService<ZbCate>{
 
     List getAll();
 
+
+    List<Integer> getByFida();
+
     /**
      *
      * @param pid

@@ -95,6 +95,8 @@ public class ZbActivityServiceImpl extends BaseServiceImpl<ZbActivityMapper, ZbA
         HashMap<String, Object> map = new HashMap<>();
         Page<ZbActivity> page = zbActivityMapper.getActivity();
         map.put("content", generator.convert(page.getResult(), ZbActivityDto.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }

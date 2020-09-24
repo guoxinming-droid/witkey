@@ -110,6 +110,11 @@ public class ZbCateServiceImpl extends BaseServiceImpl<ZbCateMapper, ZbCate> imp
         return  zbCateMapper.getAll();
     }
 
+    @Override
+    public List<Integer> getByFida() {
+        return zbCateMapper.getByFida();
+    }
+
     /**
      * @param pid
      * @return

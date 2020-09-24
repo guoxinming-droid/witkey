@@ -10,11 +10,16 @@ import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.modules.shop.domain.ZbUserDetail;
+import co.zhenxi.modules.shop.domain.ZbUserDetailAdvice;
+import co.zhenxi.modules.shop.service.ZbCateService;
 import co.zhenxi.modules.shop.service.ZbUserDetailService;
 import co.zhenxi.modules.shop.service.dto.ZbUserDetailDto;
 import co.zhenxi.modules.shop.service.dto.ZbUserDetailQueryCriteria;
+import co.zhenxi.modules.shop.service.mapper.ZbCateMapper;
 import co.zhenxi.modules.shop.service.mapper.ZbUserDetailMapper;
 import co.zhenxi.utils.FileUtil;
+import co.zhenxi.utils.StringUtils;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +52,11 @@ public class ZbUserDetailServiceImpl extends BaseServiceImpl<ZbUserDetailMapper,
 
     private final IGenerator generator;
     private final ZbUserDetailMapper zbUserDetailMapper;
+    private final  ZbCateService zbCateService;
+    private final ZbShopServiceImpl zbShopServiceImpl;
+
+
+
 
     @Override
     //@Cacheable
@@ -55,6 +65,8 @@ public class ZbUserDetailServiceImpl extends BaseServiceImpl<ZbUserDetailMapper,
         PageInfo<ZbUserDetail> page = new PageInfo<>(queryAll(criteria));
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getList(), ZbUserDetailDto.class));
+        map.put("pageNum",page.getPageNum());
+        map.put("pages",page.getPages());
         map.put("totalElements", page.getTotal());
         return map;
     }
@@ -112,5 +124,71 @@ public class ZbUserDetailServiceImpl extends BaseServiceImpl<ZbUserDetailMapper,
     @Override
     public boolean updateUserDetail(Integer uid , BigDecimal balances) {
         return zbUserDetailMapper.updateUserDetail(uid,balances);
+    }
+
+    /**
+     * 条件查询服务商
+     *
+     * @param zbUserDetailQueryCriteria
+     * @param cateId
+     * @param pageable
+     * @return
+     */
+    @Override
+    public Map<String, Object> queryAllByCateId(ZbUserDetailQueryCriteria zbUserDetailQueryCriteria, Integer cateId, Pageable pageable) {
+
+
+       String whereSql = "";
+       if(cateId!=null && cateId >0){
+           if(isCatePid(cateId)) {
+               whereSql += " and zb_shop.status = 1 and zb_shop.cate_pid =zb_cate.id and zb_shop.cate_pid =" + cateId;
+           }else {
+               whereSql += " and zb_shop.status = 1 and zb_shop.cate_pid =zb_cate.id and zb_shop.cate_sid =" + cateId;
+           }
+       }
+       if(zbUserDetailQueryCriteria.getProvince()!=null && zbUserDetailQueryCriteria.getProvince()>0){
+           whereSql +=" and zb_shop.cate_sid = zb_cate.id  and zb_user_detail.province ="+zbUserDetailQueryCriteria.getProvince();
+       }
+        if(zbUserDetailQueryCriteria.getCity()!=null && zbUserDetailQueryCriteria.getCity()>0){
+            whereSql +="and zb_shop.cate_sid = zb_cate.id and zb_user_detail.city ="+zbUserDetailQueryCriteria.getCity();
+        }
+        if(zbUserDetailQueryCriteria.getArea()!=null && zbUserDetailQueryCriteria.getArea()>0){
+            whereSql +="and zb_shop.cate_sid = zb_cate.id and zb_user_detail.area ="+zbUserDetailQueryCriteria.getArea();
+        }
+        if(zbUserDetailQueryCriteria.getName()!=null && !"".equals(zbUserDetailQueryCriteria.getName())){
+            System.out.println(zbUserDetailQueryCriteria.getName());
+            whereSql += "and zb_shop.cate_sid = zb_cate.id and zb_users.name like '%"+zbUserDetailQueryCriteria.getName()+"%'";
+            System.out.println(whereSql);
+        }
+        getPage(pageable);
+        Page<ZbUserDetailAdvice> zbUserDetailAdvices = zbUserDetailMapper.selectAll(whereSql);
+        for (ZbUserDetailAdvice zbUserDetailAdvice : zbUserDetailAdvices) {
+            Map<String, Object> authentication = zbShopServiceImpl.getAuthentication(zbUserDetailAdvice.getUid());
+            zbUserDetailAdvice.setAuthenticationList(authentication);
+        }
+        Map<String, Object> map = new LinkedHashMap<>(2);
+        map.put("content", generator.convert(zbUserDetailAdvices.getResult(), ZbUserDetailAdvice.class));
+        map.put("totalElements", zbUserDetailAdvices.getTotal());
+        map.put("pageNum",zbUserDetailAdvices.getPageNum());
+        map.put("pages",zbUserDetailAdvices.getPages());
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getServiceProviderById(Integer uid) {
+
+        return zbUserDetailMapper.getServiceProviderById(uid);
+    }
+
+    private boolean isCatePid(Integer catePid){
+        List<Integer> zbCatePidList = zbCateService.getByFida();
+        for (Integer integer : zbCatePidList) {
+            if(catePid.equals(integer)){
+                System.out.println(catePid+": "+integer);
+                return true;
+
+            }
+        }
+        return false;
     }
 }

@@ -16,4 +16,20 @@ import co.zhenxi.annotation.Query;
 */
 @Data
 public class ZbUserDetailQueryCriteria{
+
+    /** 精确 */
+    @Query
+    private Integer province;
+
+    /** 精确 */
+    @Query
+    private Integer city;
+
+    /** 精确 */
+    @Query
+    private Integer area;
+
+    /** 模糊 */
+    @Query(type = Query.Type.INNER_LIKE)
+    private String name;
 }

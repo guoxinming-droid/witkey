@@ -96,8 +96,29 @@ public class SignUpController {
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
     @PostMapping("/loginByEmail")
-    public ResponseEntity<Object> loginByEmail(@RequestBody ZbUsers zbUsers) throws Exception {
-        return zbUsersService.loginByEmail(zbUsers);
+    public ResponseEntity<Object> loginByEmail(HttpServletRequest request,@RequestBody ZbUsers zbUsers,@RequestParam("emailVrifyCode")String emailVrifyCode1) throws Exception {
+        String emailVrifyCode =(String) request.getSession().getAttribute("emailVrifyCode");
+        if(!emailVrifyCode.equals(emailVrifyCode1)){
+            HashMap<String, String> stringStringHashMap = new HashMap<>(1);
+            stringStringHashMap.put("message","验证码错误");
+            return new ResponseEntity<>(stringStringHashMap,HttpStatus.BAD_REQUEST);
+        }
+        zbUsersService.loginByEmail(zbUsers);
+        return  new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Log("邮箱发送验证码")
+    @ApiOperation("邮箱发送验证码")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @PostMapping("/sendEmailVCode")
+    public ResponseEntity<Object> sendEmailVCode(HttpServletRequest request,@RequestParam("email")String email) throws Exception {
+
+        Map<String, Object> stringObjectMap = zbUsersService.sendEmailVCode(email);
+        String code =(String) stringObjectMap.get("code");
+        request.getSession().setAttribute("emailVrifyCode",code);
+        stringObjectMap.remove("code");
+        return  new ResponseEntity<>(stringObjectMap,HttpStatus.OK);
     }
 
     @Log("手机号注册")

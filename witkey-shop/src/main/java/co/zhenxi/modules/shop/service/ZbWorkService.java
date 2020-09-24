@@ -9,7 +9,9 @@ import co.zhenxi.common.service.BaseService;
 import co.zhenxi.modules.shop.domain.ZbWork;
 import co.zhenxi.modules.shop.service.dto.ZbWorkDto;
 import co.zhenxi.modules.shop.service.dto.ZbWorkQueryCriteria;
+import co.zhenxi.tools.service.dto.LocalStorageDto;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -45,7 +47,7 @@ public interface ZbWorkService  extends BaseService<ZbWork>{
     */
     void download(List<ZbWorkDto> all, HttpServletResponse response) throws IOException;
 
-    List<ZbWork> getWorkByTaskId(long taskId);
+    List<Map<String,Object>> getWorkByTaskId(long taskId);
 
     /**
      * 获取中标信息表
@@ -56,6 +58,19 @@ public interface ZbWorkService  extends BaseService<ZbWork>{
     /**
      * cha ru shu jv
      * @param zbWork
+     * @param attachmentIds
      */
-    Map insert(ZbWork zbWork);
+    Map insert(ZbWork zbWork, List<LocalStorageDto> attachmentIds);
+
+    List<ZbWork> getWorkByTaskId1(Integer id);
+
+    /**
+     * 获取投稿附件Id 类型
+     * @param workId
+     * @param id
+     * @return
+     */
+    List<Map<String, Object>> getWorkAttachment(Integer workId, long id);
+
+    Map<String , Object> tenderWork(Integer taskId);
 }

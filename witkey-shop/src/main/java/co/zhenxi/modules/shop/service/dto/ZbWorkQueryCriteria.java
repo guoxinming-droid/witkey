@@ -16,4 +16,6 @@ import co.zhenxi.annotation.Query;
 */
 @Data
 public class ZbWorkQueryCriteria{
+
+
 }

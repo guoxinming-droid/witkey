@@ -6,12 +6,14 @@
 */
 package co.zhenxi.modules.shop.service.impl;
 
+import co.zhenxi.annotation.AnonymousAccess;
 import co.zhenxi.modules.shop.domain.ZbUsers;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.tools.domain.vo.EmailVo;
 import co.zhenxi.tools.service.EmailConfigService;
 import co.zhenxi.tools.utils.MD5Util;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.google.code.kaptcha.impl.DefaultKaptcha;
 import lombok.AllArgsConstructor;
 import co.zhenxi.dozer.service.IGenerator;
 import com.github.pagehelper.PageInfo;
@@ -21,6 +23,7 @@ import co.zhenxi.modules.shop.service.ZbUsersService;
 import co.zhenxi.modules.shop.service.dto.ZbUsersDto;
 import co.zhenxi.modules.shop.service.dto.ZbUsersQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbUsersMapper;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,10 +35,12 @@ import org.springframework.transaction.annotation.Transactional;
 //import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+import javax.websocket.Session;
 
 /**
 * @author guoke
@@ -52,6 +57,10 @@ public class ZbUsersServiceImpl extends BaseServiceImpl<ZbUsersMapper, ZbUsers> 
     private final ZbUsersMapper zbUsersMapper;
 
     private final EmailConfigService emailConfigService;
+
+
+    private final DefaultKaptcha defaultKaptcha;
+
 
 
     @Override
@@ -107,17 +116,16 @@ public class ZbUsersServiceImpl extends BaseServiceImpl<ZbUsersMapper, ZbUsers> 
      * @param zbUsers
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> loginByEmail(ZbUsers zbUsers) throws Exception {
         List<String> list = subUUID();
         String salt = list.get(0);
         String validationCode = list.get(1);
         String reSetPasswordCode = list.get(2);
-
         if(zbUsers!=null){
             zbUsers.setEmailStatus(0);
             zbUsers.setSalt(salt);
-            //账户未激活
-            zbUsers.setStatus(0);
+            zbUsers.setStatus(1);
             //来自PC注册
             zbUsers.setSource(1);
             zbUsers.setIsvip(0);
@@ -127,7 +135,7 @@ public class ZbUsersServiceImpl extends BaseServiceImpl<ZbUsersMapper, ZbUsers> 
             zbUsers.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
             //插入之后一概返回ID 带入超链接
             zbUsersMapper.insert(zbUsers);
-            sendEmail(zbUsers);
+            //sendEmail(zbUsers);
             //Thread.sleep(2000);
             return new ResponseEntity<>(HttpStatus.OK);
 
@@ -136,20 +144,49 @@ public class ZbUsersServiceImpl extends BaseServiceImpl<ZbUsersMapper, ZbUsers> 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    private boolean sendEmail(ZbUsers zbUsers) {
+    private String sendEmail(ZbUsers zbUsers) {
+        String text = defaultKaptcha.createText();
         EmailVo emailVo = new EmailVo();
         ArrayList<String> email = new ArrayList<>();
         email.add(zbUsers.getEmail());
         emailVo.setTos(email);
-        emailVo.setSubject("激活账户");
-        emailVo.setContent("你好这是一封测试邮件 <a href='www.baidu.com'>点击激活</a>");
+        emailVo.setSubject("邮箱验证");
+        emailVo.setContent("<div style=\"height: auto;\n" +
+                "\t\t\twidth: 820px;\n" +
+                "\t\t\tmin-width: 820px;\n" +
+                "\t\t\tmargin: 0 auto;\n" +
+                "\t\t\tmargin-top: 20px;\n" +
+                "            border: 1px solid #eee;\">\n" +
+                "    <div style=\"padding: 10px;padding-bottom: 0px;\">\n" +
+                "        <p style=\"margin-bottom: 10px;padding-bottom: 0px;\">尊敬的用户，您好：</p>\n" +
+                "        <p style=\"text-indent: 2em; margin-bottom: 10px;\">您正在申请邮箱验证，您的验证码为：</p>\n" +
+                "            <p style=\"text-align: center;\n" +
+                "\t\t\tfont-family: Times New Roman;\n" +
+                "\t\t\tfont-size: 22px;\n" +
+                "\t\t\tcolor: #C60024;\n" +
+                "\t\t\tpadding: 20px 0px;\n" +
+                "\t\t\tmargin-bottom: 10px;\n" +
+                "\t\t\tfont-weight: bold;\n" +
+                "\t\t\tbackground: #ebebeb;\">"+text+"</p>\n" +
+                "\n" +
+                "\n" +
+                "        <div class=\"foot-hr hr\" style=\"margin: 0 auto;\n" +
+                "\t\t\tz-index: 111;\n" +
+                "\t\t\twidth: 800px;\n" +
+                "\t\t\tmargin-top: 30px;\n" +
+                "\t\t\tborder-top: 1px solid #DA251D;\">\n" +
+                "        </div>\n" +
+                "\n" +
+                "\n" +
+                "    </div>\n" +
+                "</div>");
         try {
             emailConfigService.send(emailVo, emailConfigService.find());
             //Thread.sleep(2000);
-            return true;
+            return text;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
@@ -198,8 +235,7 @@ public class ZbUsersServiceImpl extends BaseServiceImpl<ZbUsersMapper, ZbUsers> 
         stringObjectHashMap.put("flag",false);
         //phoneNum非空判断
         if(!"".equals(zbUsers.getEmail()) && zbUsers.getEmail().length()>0){
-            Integer id = zbUsers.getId();
-            ZbUsers zbUsers1 = zbUsersMapper.selectById(id);
+            ZbUsers zbUsers1 = zbUsersMapper.selectByEmail(zbUsers.getEmail());
             if(zbUsers1!=null && zbUsers.getEmail().equals(zbUsers1.getEmail())){
                 stringObjectHashMap.put("flag",true);
             }
@@ -263,5 +299,29 @@ public class ZbUsersServiceImpl extends BaseServiceImpl<ZbUsersMapper, ZbUsers> 
             }
             return zbUsers1;
         }
+    }
+
+    @Override
+    public Map<String, Object> sendEmailVCode(String email) {
+        LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
+        if(email==null){
+            linkedHashMap.put("flag",false);
+            linkedHashMap.put("message","邮箱错误或为空");
+            return linkedHashMap;
+        }
+        ZbUsers zbUsers = new ZbUsers();
+        zbUsers.setEmail(email);
+        String code = sendEmail(zbUsers);
+
+        if(code == null) {
+            linkedHashMap.put("flag",false);
+            linkedHashMap.put("message","发送失败，请稍后再试");
+            return linkedHashMap;
+        }
+        linkedHashMap.put("flag",true);
+        linkedHashMap.put("message","发送成功");
+        linkedHashMap.put("code",code);
+
+        return linkedHashMap;
     }
 }

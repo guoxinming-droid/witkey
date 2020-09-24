@@ -35,7 +35,7 @@ public class ZbWork implements Serializable {
 
     /** 被关注者id */
     @NotBlank
-    private String desc;
+    private String descs;
 
 
     /** 状态 */

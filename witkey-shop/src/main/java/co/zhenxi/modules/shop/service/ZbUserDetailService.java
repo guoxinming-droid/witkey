@@ -54,4 +54,15 @@ public interface ZbUserDetailService  extends BaseService<ZbUserDetail>{
      * @return
      */
     boolean updateUserDetail(Integer uid , BigDecimal balances);
+
+    /**
+     * 条件查询服务商
+     * @param zbUserDetailQueryCriteria
+     * @param cateId
+     * @param pageable
+     * @return
+     */
+    Map<String,Object> queryAllByCateId(ZbUserDetailQueryCriteria zbUserDetailQueryCriteria, Integer cateId, Pageable pageable);
+
+    Map<String,Object> getServiceProviderById(Integer uid);
 }

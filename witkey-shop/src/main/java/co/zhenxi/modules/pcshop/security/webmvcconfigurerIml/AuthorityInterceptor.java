@@ -26,7 +26,10 @@ public class AuthorityInterceptor implements HandlerInterceptor {
     static {
         //拦截的u'ri都配到这里 需要全路径 不能使用通配符
         NOT_INTERCEPT_URI.add("/api/homePage/releaseTask");
-        NOT_INTERCEPT_URI.add("/api/signUp/isEmail");
+        NOT_INTERCEPT_URI.add("/api/taskPage/collectionTask");
+        NOT_INTERCEPT_URI.add("/api/taskPage/tenderWork");
+        NOT_INTERCEPT_URI.add("/api/taskPage/getTaskToEcho");
+
         NOT_INTERCEPT_URI.add("/api/employShop/InsertEmploy");
     }
 

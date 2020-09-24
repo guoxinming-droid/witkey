@@ -2,12 +2,11 @@ package co.zhenxi.modules.pcshop.rest;
 
 import co.zhenxi.annotation.AnonymousAccess;
 import co.zhenxi.logging.aop.log.Log;
-import co.zhenxi.modules.shop.service.ZbGoodsCommentService;
-import co.zhenxi.modules.shop.service.ZbGoodsService;
-import co.zhenxi.modules.shop.service.ZbShopOrderService;
-import co.zhenxi.modules.shop.service.ZbShopService;
+import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbGoodsCommentQueryCriteria;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
+import co.zhenxi.modules.shop.service.dto.ZbUserDetailQueryCriteria;
+import co.zhenxi.modules.shop.service.dto.ZbUsersQueryCriteria;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -33,20 +32,36 @@ public class ServiceProviderController {
 
     private final ZbGoodsCommentService zbGoodsCommentService;
 
-    private final ZbShopOrderService zbShopOrderService;
+    private final ZbUserDetailService zbUserDetailService;
 
 
     @Log("条件搜索服务商")
     @ApiOperation("条件搜索服务商")
     //@PreAuthorize("@el.check('admin','zbAd:del')")
     @AnonymousAccess
-    @PostMapping("/getServiceProvider")
+    @GetMapping("/getServiceProvider")
     public ResponseEntity<Object> getServiceProvider(
             //店铺的标签 和 地址 搜索条件
-            ZbShopQueryCriteria zbShopQueryCriteria,
+            ZbUserDetailQueryCriteria zbUserDetailQueryCriteria,
+            Integer cateId,
             Pageable pageable) throws Exception {
-        return new ResponseEntity<>(zbShopService.queryAll(zbShopQueryCriteria,pageable), HttpStatus.OK);
+        System.out.println(zbUserDetailQueryCriteria==null);
+            return new ResponseEntity<>(zbUserDetailService.queryAllByCateId(zbUserDetailQueryCriteria,cateId, pageable), HttpStatus.OK);
+           // return new ResponseEntity<>(zbUserDetailService.queryAll(zbUserDetailQueryCriteria, pageable), HttpStatus.OK);
     }
+
+
+    @Log("获取服务商资料")
+    @ApiOperation("获取服务商资料")
+    //@PreAuthorize("@el.check('admin','zbAd:del')")
+    @AnonymousAccess
+    @GetMapping("/getServiceProviderByIdT")
+    public ResponseEntity<Object> getServiceProvider(@RequestParam("id") Integer uid) throws Exception {
+
+        return new ResponseEntity<>(zbUserDetailService.getServiceProviderById(uid), HttpStatus.OK);
+        // return new ResponseEntity<>(zbUserDetailService.queryAll(zbUserDetailQueryCriteria, pageable), HttpStatus.OK);
+    }
+
 
     @Log("服务商详情页")
     @ApiOperation("服务商详情页")

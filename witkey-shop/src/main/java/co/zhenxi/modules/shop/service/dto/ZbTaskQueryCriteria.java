@@ -22,9 +22,27 @@ public class ZbTaskQueryCriteria{
     @Query(type = Query.Type.INNER_LIKE)
     private String title;
 
+
+    /** 模糊 */
+    @Query(type = Query.Type.INNER_LIKE)
+    private String tagName;
+
+
+    /** 模糊 */
+    @Query(type = Query.Type.INNER_LIKE)
+    private String tagPname;
+
     /** 精确 */
     @Query
     private Integer typeId;
+
+    /** 精确 */
+    @Query
+    private Integer cateId;
+
+    /** 精确 */
+    @Query
+    private Integer catePid;
 
     /** 精确 */
     @Query

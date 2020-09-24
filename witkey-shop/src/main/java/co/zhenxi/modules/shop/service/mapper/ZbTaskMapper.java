@@ -88,4 +88,24 @@ public interface ZbTaskMapper extends CoreMapper<ZbTask> {
 
     @Update("update zb_task set delivery_count = delivery_count+1 ,updated_at = #{timestamp} where id =#{taskId}")
     void updateDeliveryCount(Integer taskId, Timestamp timestamp);
+
+    @Select("SELECT\n" +
+            " zb_users.name as username,\n" +
+            "\tzb_task.*,\n" +
+            "CASE\n" +
+            "\tzb_task.type_id \n" +
+            "\tWHEN 1 THEN\n" +
+            "\t'悬赏模式' \n" +
+            "\tWHEN 3 THEN\n" +
+            "\t'招标模式' \n" +
+            "\tEND AS typeName \n" +
+            "FROM\n" +
+            "\tzb_task ,\n" +
+            "\tzb_users\n" +
+            "WHERE\n" +
+            "\tzb_task.id = #{id}\n" +
+            "\tand zb_task.uid = zb_users.id")
+    ZbTaskAdvice getAllAndTaskTypeById(long id);
+
+
 }

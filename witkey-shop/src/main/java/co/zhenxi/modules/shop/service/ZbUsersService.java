@@ -89,4 +89,5 @@ public interface ZbUsersService  extends BaseService<ZbUsers>{
      */
     ZbUsers login(ZbUsers zbUsers);
 
+    Map<String,Object> sendEmailVCode(String email);
 }

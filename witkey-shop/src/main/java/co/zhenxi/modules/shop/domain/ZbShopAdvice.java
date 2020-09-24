@@ -31,6 +31,12 @@ public class ZbShopAdvice extends ZbShop {
 
     private String userName;
 
+    private String userPic;
+
+    private Map<String ,Object> authenticationMap;
+
+    private Integer serviceCount;
+
 
     /**
      * 好评率

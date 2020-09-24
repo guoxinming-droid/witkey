@@ -229,6 +229,8 @@ public class ZbTask implements Serializable {
     private Timestamp updatedAt;
 
 
+
+
     /** 用户职位*/
     @TableField(exist = false)
     private ZbUsers zbUsers;

@@ -47,8 +47,11 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String avatarUtl = "file:" + avatar.replace("\\","/");
         String pathUtl = "file:" + path.replace("\\","/");
+                                                                                    //D:\witkey\file\
         registry.addResourceHandler("/avatar/**").addResourceLocations(avatarUtl).setCachePeriod(0);
+                                                                                    // D:\witkey\avatar\
         registry.addResourceHandler("/file/**").addResourceLocations(pathUtl).setCachePeriod(0);
+        //localhost :8080/avatar/
         registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/").setCachePeriod(0);
     }
 }
