@@ -116,4 +116,8 @@ public interface ZbGoodsMapper extends CoreMapper<ZbGoods> {
             "\tzb_goods where status = '1'  AND is_delete = '0' AND id = ${id} ")
     List<ZbGoods> selectById(Integer id);
 
+
+    @Select(" SELECT  id,uid,shop_id,cate_id,title,des,unit,type,cash,cover,status,tool_expiration_time,is_recommend,recommend_end,sales_num,comments_num,good_comment,view_num,is_delete,recommend_text,seo_title,seo_keyword,seo_desc,created_at,updated_at FROM  zb_goods where id =${id} ")
+    ZbGoods getZbGoodsById(Integer id);
+
 }

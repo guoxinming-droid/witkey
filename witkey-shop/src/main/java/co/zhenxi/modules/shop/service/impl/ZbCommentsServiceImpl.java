@@ -87,4 +87,11 @@ public class ZbCommentsServiceImpl extends BaseServiceImpl<ZbCommentsMapper, ZbC
         }
         FileUtil.downloadExcel(list, response);
     }
+
+    @Override
+    public List<ZbComments> getCommentsByTaskId(Integer taskId) {
+        return zbCommentsMapper.getCommentsByTaskId(taskId);
+    }
+
+
 }

@@ -13,7 +13,6 @@ import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.modules.system.domain.Job;
-import co.zhenxi.modules.system.service.DeptService;
 import co.zhenxi.modules.system.service.JobService;
 import co.zhenxi.modules.system.service.dto.JobDto;
 import co.zhenxi.modules.system.service.dto.JobQueryCriteria;
@@ -49,7 +48,7 @@ public class JobServiceImpl extends BaseServiceImpl<JobMapper, Job> implements J
 
     private final IGenerator generator;
 
-    private final DeptService deptService;
+    //private final DeptService deptService;
 
     @Override
     //@Cacheable
@@ -67,24 +66,24 @@ public class JobServiceImpl extends BaseServiceImpl<JobMapper, Job> implements J
     //@Cacheable
     public List<Job> queryAll(JobQueryCriteria criteria){
         List<Job> jobList = baseMapper.selectList(QueryHelpPlus.getPredicate(Job.class, criteria));
-        List<Job> jobScopeList = new ArrayList<>();
-        if(criteria.getDeptIds().size()==0){
-            for (Job job : jobList) {
-                    job.setDept(deptService.getById(job.getDeptId()));
-                    jobScopeList.add(job);
-            }
-        }else {
-            //断权限范围
-            for (Long deptId : criteria.getDeptIds()) {
-                for (Job job : jobList) {
-                    if(deptId ==job.getDeptId()){
-                        job.setDept(deptService.getById(job.getDeptId()));
-                        jobScopeList.add(job);
-                    }
-                }
-            }
-        }
-        return jobScopeList;
+//        List<Job> jobScopeList = new ArrayList<>();
+//        if(criteria.getDeptIds().size()==0){
+//            for (Job job : jobList) {
+//                    job.setDept(deptService.getById(job.getDeptId()));
+//                    jobScopeList.add(job);
+//            }
+//        }else {
+//            //断权限范围
+//            for (Long deptId : criteria.getDeptIds()) {
+//                for (Job job : jobList) {
+//                    if(deptId ==job.getDeptId()){
+//                        //job.setDept(deptService.getById(job.getDeptId()));
+//                        jobScopeList.add(job);
+//                    }
+//                }
+//            }
+//        }
+        return jobList;
     }
 
 

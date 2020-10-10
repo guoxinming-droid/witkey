@@ -28,4 +28,26 @@ public interface ZbCommentsMapper extends CoreMapper<ZbComments> {
     List<ZbComments> selectList1(@Param("ew") Wrapper<ZbComments> queryWrapper);
 
 
+    @Select(" \tSELECT\n" +
+            "\tc.id,\n" +
+            "\tc.task_id,\n" +
+            "\tc.from_uid,\n" +
+            "\tc.to_uid,\n" +
+            "\tc.comment,\n" +
+            "\tc.comment_by,\n" +
+            "\tc.speed_score,\n" +
+            "\tc.quality_score,\n" +
+            "\tc.attitude_score,\n" +
+            "\tc.created_at,\n" +
+            "\tc.type,\n" +
+            "\tud.avatar\n" +
+            "\t,(SELECT NAME FROM zb_users WHERE c.from_uid = id ) AS fromName\n" +
+            "\t,(SELECT NAME FROM zb_users WHERE c.to_uid = id ) AS toName \n" +
+            "  FROM\n" +
+            "\tzb_comments AS c \n" +
+            "\tLEFT JOIN zb_user_detail AS ud ON c.from_uid = ud.uid\n" +
+            "  WHERE\n" +
+            "\ttask_id = ${taskId}  ")
+    List<ZbComments> getCommentsByTaskId(long taskId);
+
 }

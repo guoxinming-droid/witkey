@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 
 /**
 * @author hupeng
@@ -26,12 +25,6 @@ public class JobQueryCriteria {
 
     @Query
     private Boolean enabled;
-
-    @Query
-    private Long deptId;
-
-    @Query(propName = "deptIds",  type = Query.Type.IN)
-    private Set<Long> deptIds;
 
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> createTime;

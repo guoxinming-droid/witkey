@@ -66,4 +66,9 @@ public interface ZbTaskMapper extends CoreMapper<ZbTask> {
     List<ZbTask> getTaskHallList(String whereSql);
 
 
+
+
+    @Select(" select * from zb_task  ${ew.customSqlSegment} ")
+    List<ZbTask> getTaskList(@Param("ew") Wrapper<ZbTask> queryWrapper);
+
 }

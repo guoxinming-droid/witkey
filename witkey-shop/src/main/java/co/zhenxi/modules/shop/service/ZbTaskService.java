@@ -75,14 +75,14 @@ public interface ZbTaskService  extends BaseService<ZbTask>{
      * @param pageable 分页参数
      * @return Map<String,Object>
      */
-    Map<String,Object> queryAll(ZbTaskQueryCriteria criteria, Pageable pageable);
+    Map<String,Object> getTaskList(ZbTaskQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询所有数据不分页
      * @param criteria 条件参数
      * @return List<ZbTaskDto>
      */
-    List<ZbTask> queryAll(ZbTaskQueryCriteria criteria);
+    List<ZbTask> getTaskList(ZbTaskQueryCriteria criteria);
 
 
     /**

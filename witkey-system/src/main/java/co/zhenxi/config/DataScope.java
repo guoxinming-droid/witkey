@@ -5,8 +5,6 @@
  */
 package co.zhenxi.config;
 
-import co.zhenxi.modules.system.domain.Dept;
-import co.zhenxi.modules.system.service.DeptService;
 import co.zhenxi.modules.system.service.RoleService;
 import co.zhenxi.modules.system.service.UserService;
 import co.zhenxi.modules.system.service.dto.RoleSmallDto;
@@ -14,7 +12,6 @@ import co.zhenxi.modules.system.service.dto.UserDto;
 import co.zhenxi.utils.SecurityUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,12 +30,11 @@ public class DataScope {
 
     private final RoleService roleService;
 
-    private final DeptService deptService;
+    //private final DeptService deptService;
 
-    public DataScope(UserService userService, RoleService roleService, DeptService deptService) {
+    public DataScope(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.deptService = deptService;
     }
 
     public Set<Long> getDeptIds() {
@@ -58,38 +54,38 @@ public class DataScope {
             }
 
             // 存储本级的数据权限
-            if (scopeType[1].equals(role.getDataScope())) {
-                deptIds.add(user.getDept().getId());
-            }
+//            if (scopeType[1].equals(role.getDataScope())) {
+//                deptIds.add(user.getDept().getId());
+//            }
 
             // 存储自定义的数据权限
-            if (scopeType[2].equals(role.getDataScope())) {
-                Set<Dept> depts = deptService.findByRoleIds(role.getId());
-                for (Dept dept : depts) {
-                    deptIds.add(dept.getId());
-                    List<Dept> deptChildren = deptService.findByPid(dept.getId());
-                    if (deptChildren != null && deptChildren.size() != 0) {
-                        deptIds.addAll(getDeptChildren(deptChildren));
-                    }
-                }
-            }
+//            if (scopeType[2].equals(role.getDataScope())) {
+//                Set<Dept> depts = deptService.findByRoleIds(role.getId());
+//                for (Dept dept : depts) {
+//                    deptIds.add(dept.getId());
+//                    List<Dept> deptChildren = deptService.findByPid(dept.getId());
+//                    if (deptChildren != null && deptChildren.size() != 0) {
+//                        deptIds.addAll(getDeptChildren(deptChildren));
+//                    }
+//                }
+//            }
         }
         return deptIds;
     }
 
 
-    public List<Long> getDeptChildren(List<Dept> deptList) {
-        List<Long> list = new ArrayList<>();
-        deptList.forEach(dept -> {
-                    if (dept!=null && dept.getEnabled()){
-                        List<Dept> depts = deptService.findByPid(dept.getId());
-                        if(deptList.size() != 0){
-                            list.addAll(getDeptChildren(depts));
-                        }
-                        list.add(dept.getId());
-                    }
-                }
-        );
-        return list;
-    }
+//    public List<Long> getDeptChildren(List<Dept> deptList) {
+//        List<Long> list = new ArrayList<>();
+//        deptList.forEach(dept -> {
+//                    if (dept!=null && dept.getEnabled()){
+//                        List<Dept> depts = deptService.findByPid(dept.getId());
+//                        if(deptList.size() != 0){
+//                            list.addAll(getDeptChildren(depts));
+//                        }
+//                        list.add(dept.getId());
+//                    }
+//                }
+//        );
+//        return list;
+//    }
 }

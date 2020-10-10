@@ -60,4 +60,7 @@ public interface ZbServiceService  extends BaseService<ZbService>{
      */
     List<ZbService> serviceList(ZbServiceQueryCriteria criteria);
 
+
+    List<ZbService> getServiceListByTaskId(Integer taskId);
+
 }

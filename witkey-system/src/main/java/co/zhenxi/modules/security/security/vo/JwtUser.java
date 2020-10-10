@@ -41,8 +41,6 @@ public class JwtUser implements UserDetails {
 
     private final String phone;
 
-    private final String dept;
-
     private final String job;
 
     @JsonIgnore

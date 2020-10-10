@@ -28,7 +28,7 @@ public class JobDto implements Serializable {
 
     private Boolean enabled;
 
-    private DeptDto dept;
+    //private DeptDto dept;
 
     private String deptSuperiorName;
 

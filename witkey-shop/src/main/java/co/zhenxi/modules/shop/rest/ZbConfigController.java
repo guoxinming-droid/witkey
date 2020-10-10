@@ -99,12 +99,25 @@ public class ZbConfigController {
     @GetMapping("/getZbSite")
     @Log("查询站点配置")
     @ApiOperation("查询站点配置")
-  //  @PreAuthorize("@el.check('admin','zbConfig:list')")
+  //  @PreAuthorize("@el.check('admin','getZbSite:list')")
     @AnonymousAccess
     @ResponseBody
-    public List<ZbConfig> getZbSite(@RequestParam String type){
-        return zbConfigService.getZbSiteBy(type);
+    public List<ZbConfig> getZbSite(){
+        return zbConfigService.getZbSite();
     }
+
+
+
+    @GetMapping("/getConfigBySite")
+    @Log("查询站点配置")
+    @ApiOperation("查询站点配置")
+    //  @PreAuthorize("@el.check('admin','getZbSite:list')")
+    @AnonymousAccess
+    @ResponseBody
+    public List<ZbConfig> getConfigBySite(){
+        return zbConfigService.getZbSite();
+    }
+
 
 
 

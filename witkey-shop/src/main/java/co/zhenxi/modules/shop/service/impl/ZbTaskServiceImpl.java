@@ -15,8 +15,8 @@ import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbTaskDto;
 import co.zhenxi.modules.shop.service.dto.ZbTaskQueryCriteria;
 import co.zhenxi.modules.shop.service.mapper.ZbTaskMapper;
+import co.zhenxi.modules.until.DateDown;
 import co.zhenxi.tools.service.LocalStorageService;
-import co.zhenxi.utils.DateUtils;
 import co.zhenxi.utils.FileUtil;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
@@ -58,6 +58,8 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
     private final ZbTaskAttachmentService zbTaskAttachmentService;
     private final LocalStorageService localStorageService;
     private final ZbWorkService zbWorkService;
+    private final ZbCommentsService zbCommentsService;
+    private final ZbServiceService zbServiceService;
 
     @Override
     //@Cacheable
@@ -156,6 +158,7 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
         zbTask1.setZbUsers(zbUserService.getById(zbTask1.getUid()));
         zbTask1.setZbTaskType(zbTaskTypeService.getById(zbTask1.getTypeId()));
         zbTask1.setZbTaskExtra(zbTaskExtraService.getByTaskId(zbTask1.getId()));
+        zbTask1.setZbComments(zbCommentsService.getCommentsByTaskId(zbTask1.getId()));
         ZbTaskAttachment  zbTaskAttachment = zbTaskAttachmentService.getByTaskId(zbTask1.getId());
         if(zbTaskAttachment!=null){
             zbTask1.setLocalStorage(localStorageService.getById(zbTaskAttachment.getAttachmentId()));
@@ -171,9 +174,9 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
     }
 
     @Override
-    public Map<String, Object> queryAll(ZbTaskQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> getTaskList(ZbTaskQueryCriteria criteria, Pageable pageable) {
         getPage(pageable);
-        PageInfo<ZbTask> page = new PageInfo<>(queryAll(criteria));
+        PageInfo<ZbTask> page = new PageInfo<>(getTaskList(criteria));
         page.setSize(15);
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getList(), ZbTaskDto.class));
@@ -182,8 +185,17 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
     }
 
     @Override
-    public List<ZbTask> queryAll(ZbTaskQueryCriteria criteria) {
-        return zbTaskMapper.selectList(QueryHelpPlus.getPredicate(ZbTask.class, criteria));
+    public List<ZbTask> getTaskList(ZbTaskQueryCriteria criteria) {
+        List<ZbTask> zbTask =zbTaskMapper.getTaskList(QueryHelpPlus.getPredicate(ZbTask.class, criteria));
+
+        //List<ZbTask> zbTask =zbTaskMapper.getTaskList(QueryHelpPlus.getPredicate(ZbTask.class, criteria));
+        for(ZbTask task:zbTask){
+            String dateDown = DateDown.CountDownDate(task.getCreatedAt(),new Timestamp(System.currentTimeMillis()));
+            String countDown  = "距离时间："+ dateDown;
+            task.setCountDown(countDown);
+            task.setZbService(zbServiceService.getServiceListByTaskId(task.getId()));
+        }
+        return generator.convert(zbTask, ZbTask.class);
     }
 
     @Override
@@ -191,10 +203,10 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
         getPage(pageable);
         System.out.println(pageable.getSort());
         List<ZbTask> pages = getTaskHallList(typeId,cateId);
-        for(ZbTask task:pages){
-            String  createTime =   DateUtils.parseDateToStr("yyyy-MM-dd HH:mm:ss",task.getCreatedAt());
-            task.setCreatedAt(Timestamp.valueOf(createTime));
-        }
+//        for(ZbTask task:pages){
+//            String  createTime =   DateUtils.parseDateToStr("yyyy-MM-dd HH:mm:ss",task.getCreatedAt());
+//            task.setCreatedAt(Timestamp.valueOf(createTime));
+//        }
         PageInfo<ZbTask> page = new PageInfo<>(pages);
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getList(), ZbTaskDto.class));

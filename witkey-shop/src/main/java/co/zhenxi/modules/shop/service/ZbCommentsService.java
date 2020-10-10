@@ -10,10 +10,11 @@ import co.zhenxi.modules.shop.domain.ZbComments;
 import co.zhenxi.modules.shop.service.dto.ZbCommentsDto;
 import co.zhenxi.modules.shop.service.dto.ZbCommentsQueryCriteria;
 import org.springframework.data.domain.Pageable;
-import java.util.Map;
-import java.util.List;
-import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
 * @author guoke
@@ -43,4 +44,9 @@ public interface ZbCommentsService  extends BaseService<ZbComments>{
     * @throws IOException /
     */
     void download(List<ZbCommentsDto> all, HttpServletResponse response) throws IOException;
+
+
+
+    List<ZbComments> getCommentsByTaskId(Integer taskId);
+
 }

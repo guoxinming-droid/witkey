@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -170,6 +171,24 @@ public class ZbGoodsServiceImpl extends BaseServiceImpl<ZbGoodsMapper, ZbGoods> 
         return map;
     }
 
+    @Override
+    public ZbGoods getGoodsById(Integer id) {
+        ZbGoods zbGoods = zbGoodsMapper.getZbGoodsById(id);
+        //累计服务
+        zbGoods.setComService(1);
+        //好评率
+        NumberFormat numberFormat = NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2);
+        String result = numberFormat.format((float)zbGoods.getGoodComment()/(float)zbGoods.getCommentsNum()*100);
+        System.out.println("diliverNum和queryMailNum的百分比为:" + result + "%");
+        Integer  goodEvaluateRate =   Integer.valueOf(result);
+        zbGoods.setGoodEvaluateRate(goodEvaluateRate);
+        //综合评分
+        zbGoods.setCompreEvaluate(1);
+
+
+        return zbGoodsMapper.getZbGoodsById(id);
+    }
 
 
 

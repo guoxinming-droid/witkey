@@ -19,7 +19,6 @@ import co.zhenxi.modules.system.domain.Role;
 import co.zhenxi.modules.system.domain.User;
 import co.zhenxi.modules.system.domain.UserAvatar;
 import co.zhenxi.modules.system.domain.UsersRoles;
-import co.zhenxi.modules.system.service.DeptService;
 import co.zhenxi.modules.system.service.JobService;
 import co.zhenxi.modules.system.service.UserAvatarService;
 import co.zhenxi.modules.system.service.UserService;
@@ -72,17 +71,17 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, User> imp
     private final SysUserMapper userMapper;
     private final UserAvatarService userAvatarService;
     private final JobService jobService;
-    private final DeptService deptService;
+    //private final DeptService deptService;
     private final RoleMapper roleMapper;
     private final RedisUtils redisUtils;
     private final UsersRolesService usersRolesService;
 
-    public SysUserServiceImpl(IGenerator generator, SysUserMapper userMapper, UserAvatarService userAvatarService, JobService jobService, DeptService deptService,  RoleMapper roleMapper, RedisUtils redisUtils, UsersRolesService usersRolesService) {
+    public SysUserServiceImpl(IGenerator generator, SysUserMapper userMapper, UserAvatarService userAvatarService, JobService jobService, RoleMapper roleMapper, RedisUtils redisUtils, UsersRolesService usersRolesService) {
         this.generator = generator;
         this.userMapper = userMapper;
         this.userAvatarService = userAvatarService;
         this.jobService = jobService;
-        this.deptService = deptService;
+        //this.deptService = deptService;
         this.roleMapper = roleMapper;
         this.redisUtils = redisUtils;
         this.usersRolesService = usersRolesService;
@@ -106,7 +105,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, User> imp
        List<User> userList =  baseMapper.selectList(QueryHelpPlus.getPredicate(User.class, criteria));
         for (User user : userList) {
             user.setJob(jobService.getById(user.getJobId()));
-            user.setDept(deptService.getById(user.getDeptId()));
+            //user.setDept(deptService.getById(user.getDeptId()));
             user.setRoles(roleMapper.findByUsers_Id(user.getId()));
         }
        return userList;
@@ -122,7 +121,6 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, User> imp
             map.put("状态：1启用、0禁用", user.getEnabled());
             map.put("密码", user.getPassword());
             map.put("用户名", user.getUsername());
-            map.put("部门名称", user.getDeptId());
             map.put("手机号码", user.getPhone());
             map.put("创建日期", user.getCreateTime());
             map.put("最后修改密码的日期", user.getLastPasswordResetTime());
@@ -145,7 +143,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserMapper, User> imp
         //用户所属岗位
         user.setJob(jobService.getById(user.getJobId()));
         //用户所属部门
-        user.setDept(deptService.getById(user.getDeptId()));
+        //user.setDept(deptService.getById(user.getDeptId()));
         return generator.convert(user,UserDto.class);
     }
 

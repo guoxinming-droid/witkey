@@ -146,4 +146,6 @@ public class ZbTaskDto implements Serializable {
 
     /** 修改时间 */
     private Timestamp updatedAt;
+
+    private  String  countDown;
 }

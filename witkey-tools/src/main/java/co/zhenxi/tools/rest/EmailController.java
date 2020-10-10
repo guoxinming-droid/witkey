@@ -4,6 +4,7 @@
  */
 package co.zhenxi.tools.rest;
 
+import co.zhenxi.annotation.AnonymousAccess;
 import co.zhenxi.tools.domain.EmailConfig;
 import co.zhenxi.tools.domain.vo.EmailVo;
 import co.zhenxi.tools.service.EmailConfigService;
@@ -36,15 +37,17 @@ public class EmailController {
         this.emailService = emailService;
     }
 
-    @GetMapping
+    @GetMapping("/getEmailConfig")
+    @AnonymousAccess
     public ResponseEntity<Object> get(){
         return new ResponseEntity<>(emailService.find(),HttpStatus.OK);
     }
 
     @Log("配置邮件")
-    @PutMapping
+    @PutMapping("/emailConfig")
     @ApiOperation("配置邮件")
-    public ResponseEntity<Object> emailConfig(@Validated @RequestBody EmailConfig emailConfig){
+    @AnonymousAccess
+    public ResponseEntity<Object> emailConfig(EmailConfig emailConfig){
         emailService.update(emailConfig,emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }

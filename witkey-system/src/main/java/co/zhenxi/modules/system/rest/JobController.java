@@ -68,8 +68,6 @@ public class JobController {
     @GetMapping
     @PreAuthorize("@el.check('admin','job:list','user:list')")
     public ResponseEntity<Object> getJobs(JobQueryCriteria criteria, Pageable pageable){
-        // 数据权限
-        criteria.setDeptIds(dataScope.getDeptIds());
         return new ResponseEntity<>(jobService.queryAll(criteria, pageable),HttpStatus.OK);
     }
 

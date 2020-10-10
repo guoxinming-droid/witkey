@@ -4,11 +4,11 @@ package co.zhenxi.modules.applets;
 import co.zhenxi.annotation.AnonymousAccess;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.logging.aop.log.Log;
-import co.zhenxi.modules.shop.domain.*;
-import co.zhenxi.modules.shop.service.ZbCateService;
-import co.zhenxi.modules.shop.service.ZbGoodsService;
-import co.zhenxi.modules.shop.service.ZbShopService;
-import co.zhenxi.modules.shop.service.ZbTaskService;
+import co.zhenxi.modules.shop.domain.ZbCate;
+import co.zhenxi.modules.shop.domain.ZbGoods;
+import co.zhenxi.modules.shop.domain.ZbShop;
+import co.zhenxi.modules.shop.domain.ZbSuccessCase;
+import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbGoodsQueryCriteria;
 import co.zhenxi.modules.shop.service.dto.ZbShopQueryCriteria;
 import co.zhenxi.modules.shop.service.dto.ZbTaskQueryCriteria;
@@ -38,6 +38,8 @@ public class HomeController {
     private final ZbShopService zbShopService;
     private final ZbGoodsService zbGoodsService;
     private final ZbSuccessCaseMapper zbSuccessCaseMapper;
+    private final ZbCommentsService zbCommentsService;
+    private final ZbWorkService zbWorkService;
 
     @GetMapping("/getZbCatesList")
     @Log("查询行业")
@@ -56,8 +58,11 @@ public class HomeController {
     //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
     @AnonymousAccess
     public ResponseEntity<Object> getTaskList(ZbTaskQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(zbTaskService.queryAll(criteria,pageable), HttpStatus.OK);
+        return new ResponseEntity<>(zbTaskService.getTaskList(criteria,pageable), HttpStatus.OK);
     }
+
+
+
 
     @GetMapping(value = "/getRecommendShopList")
     @Log("查询推荐商城首页推荐列表")
@@ -118,6 +123,44 @@ public class HomeController {
         return new ResponseEntity<>(zbGoodsService.getGoodsCommentByGoodId(id,type), HttpStatus.OK);
     }
 
+
+    @GetMapping(value = "/getTaskById")
+    @Log("查询任务详情")
+    @ApiOperation("查询任务详情")
+    //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
+    @AnonymousAccess
+    public ResponseEntity<Object> getTaskById(long id){
+        return new ResponseEntity<>(zbTaskService.getTasksById(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getCommentsByTaskId")
+    @Log("查询任务评价列表")
+    @ApiOperation("查询任务评价列表")
+    //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
+    @AnonymousAccess
+    public ResponseEntity<Object> getCommentsByTaskId(Integer taskId){
+        return new ResponseEntity<>(zbCommentsService.getCommentsByTaskId(taskId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getWorkByTaskId")
+    @Log("查询任务投稿记录列表")
+    @ApiOperation("查询任务投稿记录列表")
+    //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
+    @AnonymousAccess
+    public ResponseEntity<Object> getWorkByTaskId(Integer taskId){
+        return new ResponseEntity<>(zbWorkService.getWorkByTaskId(taskId), HttpStatus.OK);
+    }
+
+
+
+    @GetMapping(value = "/getGoodsById")
+    @Log("查询任务投稿记录列表")
+    @ApiOperation("查询任务投稿记录列表")
+    //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
+    @AnonymousAccess
+    public ResponseEntity<Object> getGoodsById(Integer id){
+        return new ResponseEntity<>(zbGoodsService.getGoodsById(id), HttpStatus.OK);
+    }
 
 
 

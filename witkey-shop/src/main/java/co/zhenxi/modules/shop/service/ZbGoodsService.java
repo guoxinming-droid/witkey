@@ -94,4 +94,13 @@ public interface ZbGoodsService  extends BaseService<ZbGoods>{
      */
     Map<String, Object> getGoodsCommentByGoodId(Integer id,Integer type);
 
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    ZbGoods getGoodsById(Integer id);
+
+
 }

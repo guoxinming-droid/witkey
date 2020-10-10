@@ -45,6 +45,7 @@ import java.util.Map;
 public class ZbServiceServiceImpl extends BaseServiceImpl<ZbServiceMapper, ZbService> implements ZbServiceService {
 
     private final IGenerator generator;
+    private final ZbServiceMapper zbServiceMapper;
 
     @Override
     //@Cacheable
@@ -96,5 +97,10 @@ public class ZbServiceServiceImpl extends BaseServiceImpl<ZbServiceMapper, ZbSer
     @Override
     public List<ZbService> serviceList(ZbServiceQueryCriteria criteria) {
         return baseMapper.selectList(QueryHelpPlus.getPredicate(ZbService.class, criteria));
+    }
+
+    @Override
+    public List<ZbService> getServiceListByTaskId(Integer taskId) {
+        return zbServiceMapper.getServiceListByTaskId(taskId);
     }
 }
