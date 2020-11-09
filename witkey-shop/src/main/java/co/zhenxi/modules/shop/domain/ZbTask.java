@@ -249,7 +249,20 @@ public class ZbTask implements Serializable {
 
     /** 稿件信息*/
     @TableField(exist = false)
+    private List<ZbComments> zbComments;
+
+    /** 服务信息*/
+    @TableField(exist = false)
+    private List<ZbService> zbService;
+
+    /** 稿件信息*/
+    @TableField(exist = false)
     private List<ZbWork> zbWork;
+
+
+    /** 倒计时 */
+    private  String  countDown;
+
 
     public void copy(ZbTask source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

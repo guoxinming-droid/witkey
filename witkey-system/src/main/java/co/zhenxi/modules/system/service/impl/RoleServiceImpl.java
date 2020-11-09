@@ -8,15 +8,10 @@
 */
 package co.zhenxi.modules.system.service.impl;
 
-import co.zhenxi.modules.system.service.dto.UserDto;
-import co.zhenxi.modules.system.service.mapper.DeptMapper;
-import co.zhenxi.modules.system.service.mapper.MenuMapper;
-import co.zhenxi.modules.system.service.mapper.RoleMapper;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.exception.EntityExistException;
-import co.zhenxi.modules.system.domain.Dept;
 import co.zhenxi.modules.system.domain.Menu;
 import co.zhenxi.modules.system.domain.Role;
 import co.zhenxi.modules.system.domain.RolesDepts;
@@ -27,6 +22,9 @@ import co.zhenxi.modules.system.service.RolesMenusService;
 import co.zhenxi.modules.system.service.dto.RoleDto;
 import co.zhenxi.modules.system.service.dto.RoleQueryCriteria;
 import co.zhenxi.modules.system.service.dto.RoleSmallDto;
+import co.zhenxi.modules.system.service.dto.UserDto;
+import co.zhenxi.modules.system.service.mapper.MenuMapper;
+import co.zhenxi.modules.system.service.mapper.RoleMapper;
 import co.zhenxi.utils.FileUtil;
 import co.zhenxi.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -42,14 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // 默认不使用缓存
@@ -69,7 +60,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     private final IGenerator generator;
     private final RoleMapper roleMapper;
     private final MenuMapper menuMapper;
-    private final DeptMapper deptMapper;
+    //private final DeptMapper deptMapper;
     private final RolesMenusService rolesMenusService;
     private final  RolesDeptsService rolesDeptsService;
 
@@ -101,7 +92,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         List<Role> roleList =  baseMapper.selectList(QueryHelpPlus.getPredicate(Role.class, criteria));
         for (Role role : roleList) {
             role.setMenus(menuMapper.findMenuByRoleId(role.getId()));
-            role.setDepts(deptMapper.findDeptByRoleId(role.getId()));
+            //role.setDepts(deptMapper.findDeptByRoleId(role.getId()));
         }
         return roleList;
     }
@@ -161,7 +152,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     public RoleDto findById(long id) {
         Role role = this.getById(id);
         role.setMenus(menuMapper.findMenuByRoleId(role.getId()));
-        role.setDepts(deptMapper.findDeptByRoleId(role.getId()));
+        //role.setDepts(deptMapper.findDeptByRoleId(role.getId()));
         return generator.convert(role, RoleDto.class);
     }
 
@@ -256,8 +247,8 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         for (Role role : roles) {
             Set<Menu> menuSet = menuMapper.findMenuByRoleId(role.getId());
             role.setMenus(menuSet);
-            Set<Dept> deptSet = deptMapper.findDeptByRoleId(role.getId());
-            role.setDepts(deptSet);
+            //Set<Dept> deptSet = deptMapper.findDeptByRoleId(role.getId());
+            //role.setDepts(deptSet);
         }
         Set<String> permissions = roles.stream().filter(role -> StringUtils.isNotBlank(role.getPermission())).map(Role::getPermission).collect(Collectors.toSet());
         permissions.addAll(

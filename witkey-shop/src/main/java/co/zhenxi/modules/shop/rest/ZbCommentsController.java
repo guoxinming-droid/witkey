@@ -85,4 +85,14 @@ public class ZbCommentsController {
         });
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping(value = "/getCommentsByTaskId")
+    @Log("查询任务评价列表")
+    @ApiOperation("查询任务评价列表")
+    //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
+    @AnonymousAccess
+    public ResponseEntity<Object> getCommentsByTaskId(Integer taskId){
+        return new ResponseEntity<>(zbCommentsService.getCommentsByTaskId(taskId), HttpStatus.OK);
+    }
+
 }

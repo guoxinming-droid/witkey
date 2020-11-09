@@ -47,4 +47,6 @@ public interface ZbConfigService  extends BaseService<ZbConfig>{
 
 
     List<ZbConfig> getZbSiteBy(String title);
+
+    List<ZbConfig> getZbSite();
 }

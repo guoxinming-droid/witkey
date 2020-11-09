@@ -7,9 +7,6 @@
 package co.zhenxi.modules.shop.service;
 import co.zhenxi.common.service.BaseService;
 import co.zhenxi.modules.shop.domain.ZbGoods;
-import co.zhenxi.modules.shop.domain.ZbGoodsAdvice;
-import co.zhenxi.modules.shop.domain.ZbGoodsComment;
-import co.zhenxi.modules.shop.service.dto.ZbGoodsCommentQueryCriteria;
 import co.zhenxi.modules.shop.service.dto.ZbGoodsDto;
 import co.zhenxi.modules.shop.service.dto.ZbGoodsQueryCriteria;
 import org.springframework.data.domain.Pageable;
@@ -99,56 +96,11 @@ public interface ZbGoodsService  extends BaseService<ZbGoods>{
 
 
     /**
-     * 获取作品和服务 排序字段 访问量
-     * @param size
+     *
+     * @param id
      * @return
      */
-    Map<String, Object> getGoods(Pageable size,Integer type);
-
-    /**
-     * 作品及服务得数量
-     * @param shopId
-     * @return
-     */
-    List<Map<String, Object>>  getGoodsCountByShopId(Integer shopId);
+    ZbGoods getGoodsById(Integer id);
 
 
-    /**
-     * 评分
-     * @param shopId
-     * @return
-     */
-    Map<String, Object>  getGoodsScoreByShopId(Integer shopId);
-
-    /**
-     * 获取好评差评
-     * @param shopId
-     * @param type
-     * @return
-     */
-    List<ZbGoodsComment> getGoodsScoreByShopIdAndType(Integer shopId, Integer type);
-
-    /**
-     * 获取商品分类
-     * @return
-     */
-    List<Map<String,Object>> getGoodsType();
-
-    ZbGoodsAdvice getGoodsByType(Integer goodsId);
-
-    /**
-     * 获取其他店铺作品
-     * @param goodsId
-     * @param pageable
-     * @return
-     */
-    List<ZbGoods> getGoodsByGoodsId(Integer goodsId, Pageable pageable);
-
-    /**
-     * 订单前数据回显
-     * @param goodsIds
-     * @param pageable
-     * @return
-     */
-    List<Map<String, Object>> GoodsPutOrder(Integer[] goodsIds, Pageable pageable);
 }

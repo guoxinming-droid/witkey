@@ -8,12 +8,12 @@ package co.zhenxi.modules.shop.service.mapper;
 
 import co.zhenxi.common.mapper.CoreMapper;
 import co.zhenxi.modules.shop.domain.ZbTask;
-import co.zhenxi.modules.shop.domain.ZbTaskAdvice;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -66,46 +66,9 @@ public interface ZbTaskMapper extends CoreMapper<ZbTask> {
     List<ZbTask> getTaskHallList(String whereSql);
 
 
-    @Select("select zb_task.*,zb_cate.name cateName from zb_task ,zb_task_focus,zb_cate where zb_task.id = zb_task_focus.task_id and zb_task_focus.uid = #{uid} and zb_task.cate_id = zb_cate.id")
-    List<ZbTaskAdvice> getCollectTask(@Param("uid")Integer uid);
-
-    @Select("SELECT\n" +
-            "\tzb_task.id id,\n" +
-            "\tzb_task.title title,\n" +
-            "\tzb_task.delivery_count deliveryCount,\n" +
-            "\tzb_task.created_at time \n" +
-            "FROM\n" +
-            "\tzb_task \n" +
-            "ORDER BY\n" +
-            "\tcreated_at desc\n" +
-            "\tLIMIT 0,\n" +
-            "\t20")
-    List<ZbTask> getByCreateTime(Timestamp createTime);
 
 
-    @Insert("insert into zb_task_focus(task_id,uid,created_at,updated_at) value(#{taskId},#{uId},#{createAt},#{updateAt})")
-    void insertCollectionTask(Integer taskId, Integer uId,Timestamp createAt,Timestamp updateAt);
-
-    @Update("update zb_task set delivery_count = delivery_count+1 ,updated_at = #{timestamp} where id =#{taskId}")
-    void updateDeliveryCount(Integer taskId, Timestamp timestamp);
-
-    @Select("SELECT\n" +
-            " zb_users.name as username,\n" +
-            "\tzb_task.*,\n" +
-            "CASE\n" +
-            "\tzb_task.type_id \n" +
-            "\tWHEN 1 THEN\n" +
-            "\t'悬赏模式' \n" +
-            "\tWHEN 3 THEN\n" +
-            "\t'招标模式' \n" +
-            "\tEND AS typeName \n" +
-            "FROM\n" +
-            "\tzb_task ,\n" +
-            "\tzb_users\n" +
-            "WHERE\n" +
-            "\tzb_task.id = #{id}\n" +
-            "\tand zb_task.uid = zb_users.id")
-    ZbTaskAdvice getAllAndTaskTypeById(long id);
-
+    @Select(" select * from zb_task  ${ew.customSqlSegment} ")
+    List<ZbTask> getTaskList(@Param("ew") Wrapper<ZbTask> queryWrapper);
 
 }

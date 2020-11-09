@@ -92,4 +92,9 @@ public class ZbConfigServiceImpl extends BaseServiceImpl<ZbConfigMapper, ZbConfi
         return zbConfigMapper.getZbSiteBy(whereSql);
     }
 
+    @Override
+    public List<ZbConfig> getZbSite() {
+        String whereSql = " where 1 = 1 AND type in ('basis','site')";
+        return zbConfigMapper.getZbSiteBy(whereSql);
+    }
 }

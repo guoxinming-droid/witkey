@@ -114,6 +114,22 @@ public class ZbGoods implements Serializable {
     @NotNull
     private Integer viewNum;
 
+    /**
+     * 好评率
+     */
+    private Integer goodEvaluateRate;
+
+    /**
+     * 综合评价
+     */
+    private Integer compreEvaluate;
+
+
+    /**
+     * 累计服务
+     */
+    private Integer comService;
+
 
     /** 用户软删除 0表示未删除 1表示删除 */
     @NotNull
@@ -136,7 +152,7 @@ public class ZbGoods implements Serializable {
     @NotBlank
     private String seoDesc;
 
-
+ 
     @NotNull
     private Timestamp createdAt;
 

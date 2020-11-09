@@ -9,7 +9,6 @@ import co.zhenxi.exception.BadRequestException;
 import co.zhenxi.modules.security.security.vo.JwtUser;
 import co.zhenxi.modules.system.service.RoleService;
 import co.zhenxi.modules.system.service.UserService;
-import co.zhenxi.modules.system.service.dto.DeptSmallDto;
 import co.zhenxi.modules.system.service.dto.JobSmallDto;
 import co.zhenxi.modules.system.service.dto.UserDto;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,7 +59,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 user.getAvatar(),
                 user.getEmail(),
                 user.getPhone(),
-                Optional.ofNullable(user.getDept()).map(DeptSmallDto::getName).orElse(null),
                 Optional.ofNullable(user.getJob()).map(JobSmallDto::getName).orElse(null),
                 roleService.mapToGrantedAuthorities(user),
                 user.getEnabled(),

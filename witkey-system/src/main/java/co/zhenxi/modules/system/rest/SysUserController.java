@@ -13,7 +13,6 @@ import co.zhenxi.exception.BadRequestException;
 import co.zhenxi.logging.aop.log.Log;
 import co.zhenxi.modules.system.domain.User;
 import co.zhenxi.modules.system.domain.vo.UserPassVo;
-import co.zhenxi.modules.system.service.DeptService;
 import co.zhenxi.modules.system.service.RoleService;
 import co.zhenxi.modules.system.service.UserService;
 import co.zhenxi.modules.system.service.dto.RoleSmallDto;
@@ -21,7 +20,6 @@ import co.zhenxi.modules.system.service.dto.UserDto;
 import co.zhenxi.modules.system.service.dto.UserQueryCriteria;
 import co.zhenxi.tools.domain.VerificationCode;
 import co.zhenxi.tools.service.VerificationCodeService;
-import co.zhenxi.utils.PageUtil;
 import co.zhenxi.utils.SecurityUtils;
 import co.zhenxi.utils.WitkeyConstant;
 import io.swagger.annotations.Api;
@@ -32,8 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,16 +54,16 @@ public class SysUserController {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final DataScope dataScope;
-    private final DeptService deptService;
+    //private final DeptService deptService;
     private final RoleService roleService;
     private final VerificationCodeService verificationCodeService;
     private final IGenerator generator;
 
-    public SysUserController(PasswordEncoder passwordEncoder, UserService userService, DataScope dataScope, DeptService deptService, RoleService roleService, VerificationCodeService verificationCodeService, IGenerator generator) {
+    public SysUserController(PasswordEncoder passwordEncoder, UserService userService, DataScope dataScope, RoleService roleService, VerificationCodeService verificationCodeService, IGenerator generator) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.dataScope = dataScope;
-        this.deptService = deptService;
+        //this.deptService = deptService;
         this.roleService = roleService;
         this.verificationCodeService = verificationCodeService;
         this.generator = generator;
@@ -87,33 +82,33 @@ public class SysUserController {
     @GetMapping
     @PreAuthorize("@el.check('admin','user:list')")
     public ResponseEntity<Object> getUsers(UserQueryCriteria criteria, Pageable pageable){
-        Set<Long> deptSet = new HashSet<>();
-        Set<Long> result = new HashSet<>();
-        if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
-            deptSet.add(criteria.getDeptId());
-            deptSet.addAll(dataScope.getDeptChildren(deptService.findByPid(criteria.getDeptId())));
-        }
+        //Set<Long> deptSet = new HashSet<>();
+//        Set<Long> result = new HashSet<>();
+//        if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
+//            deptSet.add(criteria.getDeptId());
+//            //deptSet.addAll(dataScope.getDeptChildren(deptService.findByPid(criteria.getDeptId())));
+//        }
         // 数据权限
-        Set<Long> deptIds = dataScope.getDeptIds();
+//        Set<Long> deptIds = dataScope.getDeptIds();
         // 查询条件不为空并且数据权限不为空则取交集
-        if (!CollectionUtils.isEmpty(deptIds) && !CollectionUtils.isEmpty(deptSet)){
-            // 取交集
-            result.addAll(deptSet);
-            result.retainAll(deptIds);
-            // 若无交集，则代表无数据权限
-            criteria.setDeptIds(result);
-            if(result.size() == 0){
-                return new ResponseEntity<>(PageUtil.toPage(null,0),HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(userService.queryAll(criteria,pageable),HttpStatus.OK);
-            }
-        // 否则取并集
-        } else {
-            result.addAll(deptSet);
-            result.addAll(deptIds);
-            criteria.setDeptIds(result);
+//        if (!CollectionUtils.isEmpty(deptIds) && !CollectionUtils.isEmpty(deptSet)){
+//            // 取交集
+//            result.addAll(deptSet);
+//            result.retainAll(deptIds);
+//            // 若无交集，则代表无数据权限
+//            criteria.setDeptIds(result);
+//            if(result.size() == 0){
+//                return new ResponseEntity<>(PageUtil.toPage(null,0),HttpStatus.OK);
+//            } else {
+//                return new ResponseEntity<>(userService.queryAll(criteria,pageable),HttpStatus.OK);
+//            }
+//        // 否则取并集
+//        } else {
+//            result.addAll(deptSet);
+//            result.addAll(deptIds);
+//            criteria.setDeptIds(result);
             return new ResponseEntity<>(userService.queryAll(criteria,pageable),HttpStatus.OK);
-        }
+//        }
     }
 
     @Log("新增用户")

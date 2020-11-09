@@ -9,15 +9,14 @@ package co.zhenxi.modules.shop.service.impl;
 import co.zhenxi.common.service.impl.BaseServiceImpl;
 import co.zhenxi.common.utils.QueryHelpPlus;
 import co.zhenxi.dozer.service.IGenerator;
-import co.zhenxi.modules.shop.domain.*;
+import co.zhenxi.modules.shop.domain.ZbTask;
+import co.zhenxi.modules.shop.domain.ZbTaskAttachment;
 import co.zhenxi.modules.shop.service.*;
 import co.zhenxi.modules.shop.service.dto.ZbTaskDto;
 import co.zhenxi.modules.shop.service.dto.ZbTaskQueryCriteria;
-import co.zhenxi.modules.shop.service.mapper.ZbAdMapper;
-import co.zhenxi.modules.shop.service.mapper.ZbCateMapper;
 import co.zhenxi.modules.shop.service.mapper.ZbTaskMapper;
+import co.zhenxi.modules.until.DateDown;
 import co.zhenxi.tools.service.LocalStorageService;
-import co.zhenxi.utils.DateUtils;
 import co.zhenxi.utils.FileUtil;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -60,9 +58,8 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
     private final ZbTaskAttachmentService zbTaskAttachmentService;
     private final LocalStorageService localStorageService;
     private final ZbWorkService zbWorkService;
-    private final ZbCateMapper zbCateMapper;
-    private final ZbTaskServiceMapper zbTaskServiceMapper;
-
+    private final ZbCommentsService zbCommentsService;
+    private final ZbServiceService zbServiceService;
 
     @Override
     //@Cacheable
@@ -155,72 +152,50 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
         FileUtil.downloadExcel(list, response);
     }
 
-//    @Override
-//    public ZbTask getTasksById(long id) {
-//        ZbTaskAdvice zbTask1 = zbTaskMapper.getAllAndTaskTypeById(id);
-//        zbTask1.setZbUsers(zbUserService.getById(zbTask1.getUid()));
-//        zbTask1.setZbTaskType(zbTaskTypeService.getById(zbTask1.getTypeId()));
-//        zbTask1.setZbTaskExtra(zbTaskExtraService.getByTaskId(zbTask1.getId()));
-//        ZbTaskAttachment  zbTaskAttachment = zbTaskAttachmentService.getByTaskId(zbTask1.getId());
-//        if(zbTaskAttachment!=null){
-//            zbTask1.setLocalStorage(localStorageService.getById(zbTaskAttachment.getAttachmentId()));
-//        }
-//        return generator.convert(zbTask1, ZbTask.class);
-//    }
-
     @Override
-    public ZbTaskAdvice getTasksById(long id) {
-        ZbTaskAdvice zbTask1 = zbTaskMapper.getAllAndTaskTypeById(id);
-        if(zbTask1!=null) {
-            //任务相关的投稿记录  用户头像 名字
-            List<Map<String, Object>> workByTaskId = zbWorkService.getWorkByTaskId(zbTask1.getId());
-            for (Map<String, Object> stringObjectMap : workByTaskId) {
-                Integer workId = (Integer)stringObjectMap.get("workId");
-                //投稿记录相关的附件
-                List<Map<String, Object>> workAttachment = zbWorkService.getWorkAttachment(workId,id);
-                stringObjectMap.put("localStorage",workAttachment);
-            }
-            zbTask1.setZbWorkList(workByTaskId);
-            return zbTask1;
+    public ZbTask getTasksById(long id) {
+        ZbTask zbTask1 = zbTaskMapper.selectById(id);
+        zbTask1.setZbUsers(zbUserService.getById(zbTask1.getUid()));
+        zbTask1.setZbTaskType(zbTaskTypeService.getById(zbTask1.getTypeId()));
+        zbTask1.setZbTaskExtra(zbTaskExtraService.getByTaskId(zbTask1.getId()));
+        zbTask1.setZbComments(zbCommentsService.getCommentsByTaskId(zbTask1.getId()));
+        ZbTaskAttachment  zbTaskAttachment = zbTaskAttachmentService.getByTaskId(zbTask1.getId());
+        if(zbTaskAttachment!=null){
+            zbTask1.setLocalStorage(localStorageService.getById(zbTaskAttachment.getAttachmentId()));
         }
-        return new ZbTaskAdvice();
-    }
-
-
-
-    public ZbTask getTasksById1(long id) {
-        ZbTaskAdvice zbTask1 = zbTaskMapper.getAllAndTaskTypeById(id);
-
-        return null;
+        return generator.convert(zbTask1, ZbTask.class);
     }
 
     @Override
     public ZbTask getTasksWorkById(long id) {
         ZbTask zbTask1 = baseMapper.selectById(id);
-        zbTask1.setZbWork(zbWorkService.getWorkByTaskId1(zbTask1.getId()));
+        zbTask1.setZbWork(zbWorkService.getWorkByTaskId(zbTask1.getId()));
         return generator.convert(zbTask1, ZbTask.class);
     }
 
     @Override
-    public Map<String, Object> queryAll(ZbTaskQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> getTaskList(ZbTaskQueryCriteria criteria, Pageable pageable) {
         getPage(pageable);
-        PageInfo<ZbTask> page = new PageInfo<>(queryAll(criteria));
+        PageInfo<ZbTask> page = new PageInfo<>(getTaskList(criteria));
         page.setSize(15);
         Map<String, Object> map = new LinkedHashMap<>(2);
-        List<ZbTask> list = page.getList();
-        for (ZbTask zbTask : list) {
-            zbTask.setBounty(zbTask.getBounty().setScale(2, RoundingMode.HALF_UP));
-        }
-        map.put("content", generator.convert(list, ZbTaskDto.class));
-        map.put("pageNum",page.getPageNum());
-        map.put("pages",page.getPages());
+        map.put("content", generator.convert(page.getList(), ZbTaskDto.class));
         map.put("totalElements", page.getTotal());
         return map;
     }
 
     @Override
-    public List<ZbTask> queryAll(ZbTaskQueryCriteria criteria) {
-        return zbTaskMapper.selectList(QueryHelpPlus.getPredicate(ZbTask.class, criteria));
+    public List<ZbTask> getTaskList(ZbTaskQueryCriteria criteria) {
+        List<ZbTask> zbTask =zbTaskMapper.getTaskList(QueryHelpPlus.getPredicate(ZbTask.class, criteria));
+
+        //List<ZbTask> zbTask =zbTaskMapper.getTaskList(QueryHelpPlus.getPredicate(ZbTask.class, criteria));
+        for(ZbTask task:zbTask){
+            String dateDown = DateDown.CountDownDate(task.getCreatedAt(),new Timestamp(System.currentTimeMillis()));
+            String countDown  = "距离时间："+ dateDown;
+            task.setCountDown(countDown);
+            task.setZbService(zbServiceService.getServiceListByTaskId(task.getId()));
+        }
+        return generator.convert(zbTask, ZbTask.class);
     }
 
     @Override
@@ -228,15 +203,13 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
         getPage(pageable);
         System.out.println(pageable.getSort());
         List<ZbTask> pages = getTaskHallList(typeId,cateId);
-        for(ZbTask task:pages){
-            String  createTime =   DateUtils.parseDateToStr("yyyy-MM-dd HH:mm:ss",task.getCreatedAt());
-            task.setCreatedAt(Timestamp.valueOf(createTime));
-        }
+//        for(ZbTask task:pages){
+//            String  createTime =   DateUtils.parseDateToStr("yyyy-MM-dd HH:mm:ss",task.getCreatedAt());
+//            task.setCreatedAt(Timestamp.valueOf(createTime));
+//        }
         PageInfo<ZbTask> page = new PageInfo<>(pages);
         Map<String, Object> map = new LinkedHashMap<>(2);
         map.put("content", generator.convert(page.getList(), ZbTaskDto.class));
-        map.put("pageNum",page.getPageNum());
-        map.put("pages",page.getPages());
         map.put("totalElements", page.isIsFirstPage());
         return map;
     }
@@ -254,162 +227,4 @@ public class ZbTaskServiceImpl extends BaseServiceImpl<ZbTaskMapper, ZbTask> imp
         return zbTaskMapper.getTaskHallList(whereSql);
     }
 
-    @Override
-    public List<ZbTaskAdvice> getCollectTask(Integer uid) {
-        if(uid<=0){
-            return new ArrayList<>();
-        }
-        return zbTaskMapper.getCollectTask(uid);
-    }
-
-    /**
-     * 查询所有数据分页
-     *
-     * @param createTime ss
-     * @return List<ZbTaskDto>
-     */
-    @Override
-    public List<ZbTask> getByCreateTime(Timestamp createTime) {
-        List<ZbTask> list = zbTaskMapper.getByCreateTime(createTime);
-        for (ZbTask zbTask : list) {
-            zbTask.setBounty(zbTask.getBounty().setScale(2, RoundingMode.HALF_UP));
-        }
-        return list;
-    }
-
-    /**
-     * 一键新增任务
-     *
-     * @param zbTask
-     */
-    @Override
-    public void insert(ZbTask zbTask) {
-        //根据手机号看数据库又没
-        ZbUsers zbUsers1 = zbUserService.selectByMobile(zbTask.getPhone());
-        if(null==zbUsers1){
-            ZbUsers zbUsers = new ZbUsers();
-            zbUsers.setMobile(zbTask.getPhone());
-            zbUsers.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-            Integer uId = zbUserService.loginByPhoneNum(zbUsers).getId();
-            zbTask.setUid(uId);
-        }else{
-            Integer uId = zbUsers1.getId();
-            zbTask.setUid(uId);
-            zbTask.setUsername(zbUsers1.getName());
-        }
-        zbTask.setStatus(1);
-        zbTask.setTypeId(0);
-        zbTask.setCateId(193);
-        zbTask.setUrl("");
-        zbTask.setSiteName("");
-        //前端需要增加一个标签 上线注释312 313
-        zbTask.setTagName("");
-        zbTask.setTagPname("");
-        zbTask.setType(0);
-        zbTask.setCheckedAt(new Timestamp(System.currentTimeMillis()));
-        zbTaskMapper.insert(zbTask);
-
-    }
-
-    /**
-     * 普通发布任务
-     *
-     * @param zbTask
-     * @param localStorages    附件件Id
-     */
-    @Override
-    public void releaseTask(ZbTaskAdvice zbTask, Integer[] localStorages) {
-        zbTask.setUrl("");
-        zbTask.setSiteName("");
-        //获取分级标签设置名称
-        ZbCate pZbCateBySid = getPZbCateBySid(zbTask.getCateId());
-        zbTask.setTagName(pZbCateBySid.getName());
-        zbTask.setTagPname(pZbCateBySid.getPname());
-        zbTask.setCheckedAt(new Timestamp(System.currentTimeMillis()));
-        zbTask.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-        zbTask.setType(0);
-        //获取服务
-        String service1 = zbTask.getService();
-        String[] service = splitFileName(service1);
-        //插入表
-        zbTaskMapper.insert(zbTask);
-        Integer id = zbTask.getId();
-        //插入服务表
-        for (int i = 0; i < service.length; i++) {
-            ZbTaskServiceDomain zbTaskService = new ZbTaskServiceDomain();
-            zbTaskService.setTaskId(id);
-            zbTaskService.setServiceId(Integer.parseInt(service[i]));
-            zbTaskService.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-            zbTaskService.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-            zbTaskServiceMapper.insert(zbTaskService);
-        }
-        //插入附件地址
-        for (int i = 0; i < localStorages.length; i++) {
-            ZbTaskAttachment zbTaskAttachment = new ZbTaskAttachment();
-            zbTaskAttachment.setTaskId(id);
-            zbTaskAttachment.setAttachmentId(localStorages[i]);
-            zbTaskAttachmentService.insert(zbTaskAttachment);
-        }
-
-
-    }
-
-    private String[] splitFileName(String fileName){
-        return fileName.split(",",5);
-    }
-
-    /**根据子ID获取父对象及其本身
-     *
-     */
-    private ZbCate getPZbCateBySid(Integer SiD){
-        ZbCate bySid = zbCateMapper.getBySid(SiD);
-        System.out.println(bySid.getName()+":   "+bySid.getPname());
-        return bySid;
-    }
-
-    /**
-     * 收藏任务
-     *
-     * @param taskId 任务id
-     * @param uId    用户id
-     */
-    @Override
-    public void collectionTask(Integer taskId, Integer uId) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        zbTaskMapper.insertCollectionTask(taskId,uId,timestamp,timestamp);
-    }
-
-    @Override
-    public List<ZbTask> getTasksWorkByIdPC(long taskId) {
-        return null;
-    }
-
-    @Override
-    public Map<String, Object> queryAll1(ZbTaskQueryCriteria zbTaskQueryCriteria, Pageable pageable) {
-        getPage(pageable);
-        PageInfo<ZbTask> page = new PageInfo<>(queryAll(zbTaskQueryCriteria));
-        page.setSize(15);
-        Map<String, Object> map = new LinkedHashMap<>(2);
-        List<ZbTask> list = page.getList();
-        for (ZbTask zbTask : list) {
-            zbTask.setBounty(zbTask.getBounty().setScale(2, RoundingMode.HALF_UP));
-        }
-        map.put("content", generator.convert(list, ZbTaskDto.class));
-        map.put("pageNum",page.getPageNum());
-        map.put("pages",page.getPages());
-        map.put("totalElements", page.getTotal());
-        return map;
-    }
-
-    private boolean isCatePid(Integer catePid){
-        List<Integer> zbCatePidList = zbCateMapper.getByFida();
-        for (Integer integer : zbCatePidList) {
-            if(catePid.equals(integer)){
-                System.out.println(catePid+": "+integer);
-                return true;
-
-            }
-        }
-        return false;
-    }
 }

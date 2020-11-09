@@ -5,6 +5,7 @@
 * 本软件为臻希开发研制
 */
 package co.zhenxi.modules.shop.rest;
+import co.zhenxi.annotation.AnonymousAccess;
 import co.zhenxi.dozer.service.IGenerator;
 import co.zhenxi.logging.aop.log.Log;
 import co.zhenxi.modules.shop.domain.ZbWork;
@@ -83,4 +84,14 @@ public class ZbWorkController {
         });
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping(value = "/getWorkByTaskId")
+    @Log("查询任务投稿记录列表")
+    @ApiOperation("查询任务投稿记录列表")
+    //   @PreAuthorize("@el.check('admin','XSZbTasks:list')")
+    @AnonymousAccess
+    public ResponseEntity<Object> getWorkByTaskId(Integer taskId){
+        return new ResponseEntity<>(zbWorkService.getWorkByTaskId(taskId), HttpStatus.OK);
+    }
+
 }
