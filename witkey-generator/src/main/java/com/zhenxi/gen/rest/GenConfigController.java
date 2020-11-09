@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "系统：代码生成器配置管理")
 public class GenConfigController {
 
+
     private final GenConfigService genConfigService;
 
     public GenConfigController(GenConfigService genConfigService) {
